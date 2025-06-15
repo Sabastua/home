@@ -1,11 +1,11 @@
-
 import React, { useState } from 'react';
-import { Search, Filter, MapPin, Calendar, Plus } from 'lucide-react';
+import { Search, Filter, MapPin, Calendar, Plus, User } from 'lucide-react';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Link } from 'react-router-dom';
+import OnboardingModal from '@/components/OnboardingModal';
 
 // Mock data for properties
 const properties = [
@@ -58,6 +58,7 @@ const Index = () => {
   const [selectedType, setSelectedType] = useState("All");
   const [selectedLocation, setSelectedLocation] = useState("All");
   const [searchTerm, setSearchTerm] = useState("");
+  const [showOnboarding, setShowOnboarding] = useState(false);
 
   const filteredProperties = properties.filter(property => {
     const matchesType = selectedType === "All" || property.type === selectedType;
@@ -80,6 +81,14 @@ const Index = () => {
               <h1 className="text-xl font-bold text-gray-900">Nakuru HomesConnect</h1>
             </div>
             <div className="flex items-center space-x-4">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setShowOnboarding(true)}
+              >
+                <User className="w-4 h-4 mr-2" />
+                Join as Tenant
+              </Button>
               <Link to="/admin">
                 <Button variant="outline" size="sm">
                   <Plus className="w-4 h-4 mr-2" />
@@ -87,7 +96,7 @@ const Index = () => {
                 </Button>
               </Link>
               <Link to="/dashboard">
-                <Button variant="outline" size="sm">Dashboard</Button>
+                <Button variant="outline" size="sm">Admin Dashboard</Button>
               </Link>
             </div>
           </div>
@@ -99,6 +108,23 @@ const Index = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-4xl font-bold mb-4">Find Your Perfect Home in Nakuru</h2>
           <p className="text-xl mb-8 opacity-90">Discover quality rental properties across Nakuru and surrounding areas</p>
+          
+          <div className="flex justify-center space-x-4 mb-8">
+            <Button 
+              size="lg" 
+              className="bg-white text-green-600 hover:bg-gray-100"
+              onClick={() => setShowOnboarding(true)}
+            >
+              <User className="w-5 h-5 mr-2" />
+              Join as Tenant
+            </Button>
+            <Link to="/admin">
+              <Button size="lg" variant="outline" className="text-white border-white hover:bg-white hover:text-green-600">
+                <Plus className="w-5 h-5 mr-2" />
+                List Your Property
+              </Button>
+            </Link>
+          </div>
           
           {/* Search Bar */}
           <div className="max-w-2xl mx-auto">
@@ -273,6 +299,12 @@ const Index = () => {
           </div>
         </div>
       </footer>
+
+      {/* Onboarding Modal */}
+      <OnboardingModal 
+        isOpen={showOnboarding} 
+        onClose={() => setShowOnboarding(false)} 
+      />
     </div>
   );
 };

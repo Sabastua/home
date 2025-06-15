@@ -1,31 +1,36 @@
 
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Calendar, MapPin, TrendingUp, DollarSign, Home, Receipt, Plus, Download, Eye } from 'lucide-react';
+import { Calendar, TrendingUp, DollarSign, Home, Receipt, Download, Eye, Users, Building } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, ResponsiveContainer } from 'recharts';
-import OnboardingModal from '@/components/OnboardingModal';
-import PaymentModal from '@/components/PaymentModal';
 
-// Mock data for charts and analytics
-const monthlyPayments = [
-  { month: 'Jan', rent: 25000, water: 1200, total: 26200 },
-  { month: 'Feb', rent: 25000, water: 1500, total: 26500 },
-  { month: 'Mar', rent: 25000, water: 1100, total: 26100 },
-  { month: 'Apr', rent: 25000, water: 1400, total: 26400 },
-  { month: 'May', rent: 25000, water: 1300, total: 26300 },
-  { month: 'Jun', rent: 25000, water: 1500, total: 26500 },
+// Mock data for admin analytics
+const monthlyRevenue = [
+  { month: 'Jan', rent: 250000, water: 45000, total: 295000 },
+  { month: 'Feb', rent: 275000, water: 52000, total: 327000 },
+  { month: 'Mar', rent: 300000, water: 48000, total: 348000 },
+  { month: 'Apr', rent: 325000, water: 55000, total: 380000 },
+  { month: 'May', rent: 350000, water: 58000, total: 408000 },
+  { month: 'Jun', rent: 375000, water: 62000, total: 437000 },
 ];
 
-const expenseBreakdown = [
-  { name: 'Rent', value: 25000, color: '#10b981' },
-  { name: 'Water', value: 1500, color: '#3b82f6' },
-  { name: 'Security', value: 1000, color: '#f59e0b' },
-  { name: 'Maintenance', value: 500, color: '#ef4444' },
+const propertyOccupancy = [
+  { type: 'Bedsitter', occupied: 45, vacant: 5 },
+  { type: '1BR', occupied: 30, vacant: 8 },
+  { type: '2BR', occupied: 25, vacant: 3 },
+  { type: '3BR', occupied: 15, vacant: 2 },
+];
+
+const revenueBreakdown = [
+  { name: 'Rent', value: 375000, color: '#10b981' },
+  { name: 'Water Bills', value: 62000, color: '#3b82f6' },
+  { name: 'Deposits', value: 25000, color: '#f59e0b' },
+  { name: 'Late Fees', value: 8000, color: '#ef4444' },
 ];
 
 const chartConfig = {
@@ -34,65 +39,17 @@ const chartConfig = {
   total: { label: 'Total', color: '#6366f1' },
 };
 
-// Mock tenant data
-const tenantData = {
-  isNewUser: false,
-  currentProperty: {
-    id: 1,
-    title: "Modern 2BR Apartment",
-    location: "Nakuru Town",
-    rent: 25000,
-    nextDueDate: "2024-07-15",
-    waterBill: 1500,
-    waterDueDate: "2024-07-10"
-  },
-  paymentHistory: [
-    {
-      id: 1,
-      type: "Rent",
-      amount: 25000,
-      date: "2024-06-15",
-      status: "Paid",
-      mpesaCode: "QAR5TXN123"
-    },
-    {
-      id: 2,
-      type: "Water Bill",
-      amount: 1200,
-      date: "2024-06-10",
-      status: "Paid",
-      mpesaCode: "QBR3TXN456"
-    },
-    {
-      id: 3,
-      type: "Rent",
-      amount: 25000,
-      date: "2024-05-15",
-      status: "Paid",
-      mpesaCode: "QCR1TXN789"
-    }
-  ],
-  totalPaid: 176400,
-  avgMonthlyExpense: 26300,
-  onTimePayments: 95
+// Mock admin data
+const adminData = {
+  totalProperties: 133,
+  totalTenants: 128,
+  monthlyRevenue: 437000,
+  occupancyRate: 89,
+  pendingPayments: 15,
+  maintenanceRequests: 7
 };
 
 const Dashboard = () => {
-  const [showOnboarding, setShowOnboarding] = useState(tenantData.isNewUser);
-  const [showPaymentModal, setShowPaymentModal] = useState(false);
-  const [paymentType, setPaymentType] = useState<'rent' | 'water' | 'deposit'>('rent');
-
-  const getDaysUntilDue = (dueDate: string) => {
-    const today = new Date();
-    const due = new Date(dueDate);
-    const diffTime = due.getTime() - today.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays;
-  };
-
-  const rentDaysLeft = getDaysUntilDue(tenantData.currentProperty.nextDueDate);
-  const waterDaysLeft = getDaysUntilDue(tenantData.currentProperty.waterDueDate);
-
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -103,13 +60,12 @@ const Dashboard = () => {
               <div className="w-8 h-8 bg-gradient-to-r from-green-600 to-red-600 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-sm">NH</span>
               </div>
-              <h1 className="text-xl font-bold text-gray-900">My Dashboard</h1>
+              <h1 className="text-xl font-bold text-gray-900">Admin Dashboard</h1>
             </Link>
             <div className="flex items-center space-x-4">
-              <Button variant="outline" onClick={() => setShowOnboarding(true)}>
-                <Plus className="w-4 h-4 mr-2" />
-                Get Started
-              </Button>
+              <Link to="/admin">
+                <Button variant="outline">Manage Listings</Button>
+              </Link>
               <Link to="/">
                 <Button variant="outline">Back to Home</Button>
               </Link>
@@ -120,14 +76,15 @@ const Dashboard = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">Financial Dashboard</h2>
-          <p className="text-gray-600">Track your rental payments, expenses, and financial insights</p>
+          <h2 className="text-3xl font-bold text-gray-900 mb-2">Property Management Dashboard</h2>
+          <p className="text-gray-600">Monitor your rental properties, revenue, and tenant management</p>
         </div>
 
         <Tabs defaultValue="overview" className="space-y-6">
           <TabsList>
             <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="payments">Payments</TabsTrigger>
+            <TabsTrigger value="properties">Properties</TabsTrigger>
+            <TabsTrigger value="tenants">Tenants</TabsTrigger>
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
             <TabsTrigger value="reports">Reports</TabsTrigger>
           </TabsList>
@@ -139,12 +96,12 @@ const Dashboard = () => {
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-medium text-gray-600">Total Paid</p>
+                      <p className="text-sm font-medium text-gray-600">Total Properties</p>
                       <p className="text-2xl font-bold text-green-600">
-                        KSh {tenantData.totalPaid.toLocaleString()}
+                        {adminData.totalProperties}
                       </p>
                     </div>
-                    <DollarSign className="w-8 h-8 text-green-600" />
+                    <Building className="w-8 h-8 text-green-600" />
                   </div>
                 </CardContent>
               </Card>
@@ -153,12 +110,12 @@ const Dashboard = () => {
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-medium text-gray-600">Avg Monthly</p>
+                      <p className="text-sm font-medium text-gray-600">Total Tenants</p>
                       <p className="text-2xl font-bold text-blue-600">
-                        KSh {tenantData.avgMonthlyExpense.toLocaleString()}
+                        {adminData.totalTenants}
                       </p>
                     </div>
-                    <TrendingUp className="w-8 h-8 text-blue-600" />
+                    <Users className="w-8 h-8 text-blue-600" />
                   </div>
                 </CardContent>
               </Card>
@@ -167,12 +124,12 @@ const Dashboard = () => {
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-medium text-gray-600">On-Time Rate</p>
+                      <p className="text-sm font-medium text-gray-600">Monthly Revenue</p>
                       <p className="text-2xl font-bold text-purple-600">
-                        {tenantData.onTimePayments}%
+                        KSh {adminData.monthlyRevenue.toLocaleString()}
                       </p>
                     </div>
-                    <Calendar className="w-8 h-8 text-purple-600" />
+                    <DollarSign className="w-8 h-8 text-purple-600" />
                   </div>
                 </CardContent>
               </Card>
@@ -181,83 +138,51 @@ const Dashboard = () => {
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-medium text-gray-600">Property</p>
-                      <p className="text-lg font-bold text-gray-900">Active</p>
+                      <p className="text-sm font-medium text-gray-600">Occupancy Rate</p>
+                      <p className="text-2xl font-bold text-green-600">
+                        {adminData.occupancyRate}%
+                      </p>
                     </div>
-                    <Home className="w-8 h-8 text-gray-600" />
+                    <Home className="w-8 h-8 text-green-600" />
                   </div>
                 </CardContent>
               </Card>
             </div>
 
-            {/* Payment Due Cards */}
+            {/* Revenue and Occupancy Cards */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Card>
                 <CardHeader>
-                  <CardTitle className="flex items-center justify-between">
-                    <span>Rent Payment</span>
-                    <Calendar className="w-5 h-5 text-gray-500" />
-                  </CardTitle>
+                  <CardTitle>Revenue Trends</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className={`p-4 rounded-lg ${
-                    rentDaysLeft <= 3 ? 'bg-red-50' : rentDaysLeft <= 7 ? 'bg-yellow-50' : 'bg-green-50'
-                  }`}>
-                    <div className={`text-sm font-medium ${
-                      rentDaysLeft <= 3 ? 'text-red-600' : rentDaysLeft <= 7 ? 'text-yellow-600' : 'text-green-600'
-                    }`}>
-                      Next Payment Due
-                    </div>
-                    <div className="text-2xl font-bold text-gray-900">
-                      {rentDaysLeft > 0 ? `${rentDaysLeft} days` : 'Overdue'}
-                    </div>
-                    <div className="text-sm text-gray-600">Due: {tenantData.currentProperty.nextDueDate}</div>
-                  </div>
-                  
-                  <Button 
-                    className="w-full bg-green-600 hover:bg-green-700"
-                    onClick={() => {
-                      setPaymentType('rent');
-                      setShowPaymentModal(true);
-                    }}
-                  >
-                    Pay Rent - KSh {tenantData.currentProperty.rent.toLocaleString()}
-                  </Button>
+                <CardContent>
+                  <ChartContainer config={chartConfig} className="h-[300px]">
+                    <LineChart data={monthlyRevenue}>
+                      <XAxis dataKey="month" />
+                      <YAxis />
+                      <ChartTooltip content={<ChartTooltipContent />} />
+                      <Line type="monotone" dataKey="total" stroke="var(--color-total)" strokeWidth={2} />
+                      <Line type="monotone" dataKey="rent" stroke="var(--color-rent)" strokeWidth={2} />
+                      <Line type="monotone" dataKey="water" stroke="var(--color-water)" strokeWidth={2} />
+                    </LineChart>
+                  </ChartContainer>
                 </CardContent>
               </Card>
 
               <Card>
                 <CardHeader>
-                  <CardTitle className="flex items-center justify-between">
-                    <span>Water Bill</span>
-                    <MapPin className="w-5 h-5 text-blue-500" />
-                  </CardTitle>
+                  <CardTitle>Property Occupancy</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className={`p-4 rounded-lg ${
-                    waterDaysLeft <= 2 ? 'bg-red-50' : waterDaysLeft <= 5 ? 'bg-yellow-50' : 'bg-blue-50'
-                  }`}>
-                    <div className={`text-sm font-medium ${
-                      waterDaysLeft <= 2 ? 'text-red-600' : waterDaysLeft <= 5 ? 'text-yellow-600' : 'text-blue-600'
-                    }`}>
-                      Next Payment Due
-                    </div>
-                    <div className="text-2xl font-bold text-gray-900">
-                      {waterDaysLeft > 0 ? `${waterDaysLeft} days` : 'Overdue'}
-                    </div>
-                    <div className="text-sm text-gray-600">Due: {tenantData.currentProperty.waterDueDate}</div>
-                  </div>
-                  
-                  <Button 
-                    variant="outline" 
-                    className="w-full"
-                    onClick={() => {
-                      setPaymentType('water');
-                      setShowPaymentModal(true);
-                    }}
-                  >
-                    Pay Water Bill - KSh {tenantData.currentProperty.waterBill.toLocaleString()}
-                  </Button>
+                <CardContent>
+                  <ChartContainer config={chartConfig} className="h-[300px]">
+                    <BarChart data={propertyOccupancy}>
+                      <XAxis dataKey="type" />
+                      <YAxis />
+                      <ChartTooltip content={<ChartTooltipContent />} />
+                      <Bar dataKey="occupied" fill="#10b981" />
+                      <Bar dataKey="vacant" fill="#ef4444" />
+                    </BarChart>
+                  </ChartContainer>
                 </CardContent>
               </Card>
             </div>
@@ -265,36 +190,17 @@ const Dashboard = () => {
 
           <TabsContent value="analytics" className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Monthly Payments Trend */}
+              {/* Revenue Breakdown */}
               <Card>
                 <CardHeader>
-                  <CardTitle>Monthly Payment Trends</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ChartContainer config={chartConfig} className="h-[300px]">
-                    <LineChart data={monthlyPayments}>
-                      <XAxis dataKey="month" />
-                      <YAxis />
-                      <ChartTooltip content={<ChartTooltipContent />} />
-                      <Line type="monotone" dataKey="rent" stroke="var(--color-rent)" strokeWidth={2} />
-                      <Line type="monotone" dataKey="water" stroke="var(--color-water)" strokeWidth={2} />
-                      <Line type="monotone" dataKey="total" stroke="var(--color-total)" strokeWidth={2} />
-                    </LineChart>
-                  </ChartContainer>
-                </CardContent>
-              </Card>
-
-              {/* Expense Breakdown */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Expense Breakdown</CardTitle>
+                  <CardTitle>Revenue Breakdown</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="h-[300px]">
                     <ResponsiveContainer width="100%" height="100%">
                       <PieChart>
                         <Pie
-                          data={expenseBreakdown}
+                          data={revenueBreakdown}
                           cx="50%"
                           cy="50%"
                           innerRadius={60}
@@ -302,7 +208,7 @@ const Dashboard = () => {
                           paddingAngle={5}
                           dataKey="value"
                         >
-                          {expenseBreakdown.map((entry, index) => (
+                          {revenueBreakdown.map((entry, index) => (
                             <Cell key={`cell-${index}`} fill={entry.color} />
                           ))}
                         </Pie>
@@ -323,25 +229,17 @@ const Dashboard = () => {
                       </PieChart>
                     </ResponsiveContainer>
                   </div>
-                  <div className="grid grid-cols-2 gap-2 mt-4">
-                    {expenseBreakdown.map((item, index) => (
-                      <div key={index} className="flex items-center space-x-2">
-                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }} />
-                        <span className="text-sm">{item.name}</span>
-                      </div>
-                    ))}
-                  </div>
                 </CardContent>
               </Card>
 
-              {/* Payment Comparison */}
-              <Card className="lg:col-span-2">
+              {/* Monthly Comparison */}
+              <Card>
                 <CardHeader>
-                  <CardTitle>Payment Comparison</CardTitle>
+                  <CardTitle>Monthly Comparison</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <ChartContainer config={chartConfig} className="h-[300px]">
-                    <BarChart data={monthlyPayments}>
+                    <BarChart data={monthlyRevenue}>
                       <XAxis dataKey="month" />
                       <YAxis />
                       <ChartTooltip content={<ChartTooltipContent />} />
@@ -354,49 +252,15 @@ const Dashboard = () => {
             </div>
           </TabsContent>
 
-          <TabsContent value="payments" className="space-y-6">
-            {/* Payment History */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Payment History</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {tenantData.paymentHistory.map((payment) => (
-                    <div key={payment.id} className="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
-                      <div className="flex items-center space-x-4">
-                        <div className={`w-3 h-3 rounded-full ${
-                          payment.status === 'Paid' ? 'bg-green-500' : 'bg-yellow-500'
-                        }`} />
-                        <div>
-                          <div className="font-medium">{payment.type}</div>
-                          <div className="text-sm text-gray-600">{payment.date}</div>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <div className="font-semibold">KSh {payment.amount.toLocaleString()}</div>
-                        <div className="text-sm text-gray-600">{payment.mpesaCode}</div>
-                      </div>
-                      <Button variant="outline" size="sm">
-                        <Receipt className="w-4 h-4 mr-1" />
-                        Receipt
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
           <TabsContent value="reports" className="space-y-6">
             {/* Financial Reports */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <Card>
                 <CardHeader>
-                  <CardTitle>Monthly Statement</CardTitle>
+                  <CardTitle>Monthly Revenue Report</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <p className="text-sm text-gray-600">Comprehensive monthly payment summary</p>
+                  <p className="text-sm text-gray-600">Comprehensive monthly revenue breakdown</p>
                   <Button className="w-full">
                     <Download className="w-4 h-4 mr-2" />
                     Download PDF
@@ -409,7 +273,7 @@ const Dashboard = () => {
                   <CardTitle>Annual Report</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <p className="text-sm text-gray-600">Yearly payment and expense analysis</p>
+                  <p className="text-sm text-gray-600">Yearly property and revenue analysis</p>
                   <Button className="w-full">
                     <Download className="w-4 h-4 mr-2" />
                     Download PDF
@@ -419,55 +283,20 @@ const Dashboard = () => {
 
               <Card>
                 <CardHeader>
-                  <CardTitle>Tax Documents</CardTitle>
+                  <CardTitle>Tenant Reports</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <p className="text-sm text-gray-600">Rent payment receipts for tax purposes</p>
+                  <p className="text-sm text-gray-600">Tenant payment history and analytics</p>
                   <Button className="w-full">
                     <Download className="w-4 h-4 mr-2" />
-                    Download ZIP
+                    Download CSV
                   </Button>
                 </CardContent>
               </Card>
             </div>
-
-            {/* Receipt Gallery */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Receipt Gallery</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                  {tenantData.paymentHistory.map((payment) => (
-                    <div key={payment.id} className="border rounded-lg p-4 text-center hover:shadow-md transition-shadow">
-                      <Receipt className="w-8 h-8 mx-auto mb-2 text-gray-400" />
-                      <div className="text-sm font-medium">{payment.type}</div>
-                      <div className="text-xs text-gray-500">{payment.date}</div>
-                      <Button variant="outline" size="sm" className="mt-2">
-                        <Eye className="w-3 h-3 mr-1" />
-                        View
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
           </TabsContent>
         </Tabs>
       </div>
-
-      {/* Modals */}
-      <OnboardingModal 
-        isOpen={showOnboarding} 
-        onClose={() => setShowOnboarding(false)} 
-      />
-      
-      <PaymentModal
-        isOpen={showPaymentModal}
-        onClose={() => setShowPaymentModal(false)}
-        paymentType={paymentType}
-        amount={paymentType === 'rent' ? tenantData.currentProperty.rent : tenantData.currentProperty.waterBill}
-      />
     </div>
   );
 };
