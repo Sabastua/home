@@ -39,10 +39,10 @@ const PropertySwipeCard: React.FC<PropertySwipeCardProps> = ({
 
   const getFeatureIcon = (feature: string) => {
     switch (feature.toLowerCase()) {
-      case 'wifi': return <Wifi className="w-3 h-3" />;
-      case 'parking': return <Car className="w-3 h-3" />;
-      case 'security': return <Shield className="w-3 h-3" />;
-      case 'generator': return <Zap className="w-3 h-3" />;
+      case 'wifi': return <Wifi className="w-4 h-4" />;
+      case 'parking': return <Car className="w-4 h-4" />;
+      case 'security': return <Shield className="w-4 h-4" />;
+      case 'generator': return <Zap className="w-4 h-4" />;
       default: return null;
     }
   };
@@ -114,7 +114,7 @@ const PropertySwipeCard: React.FC<PropertySwipeCardProps> = ({
   const opacity = isActive ? Math.max(0.7, 1 - Math.abs(dragOffset.x) / 300) : 1;
 
   return (
-    <div className="relative w-full h-[600px]">
+    <div className="fixed inset-0 z-30">
       <Card
         ref={cardRef}
         className={`
@@ -126,7 +126,10 @@ const PropertySwipeCard: React.FC<PropertySwipeCardProps> = ({
         style={{
           transform: `translateX(${dragOffset.x}px) translateY(${dragOffset.y}px) rotate(${rotation}deg)`,
           opacity,
-          borderRadius: '24px',
+          borderRadius: '0px',
+          margin: '0',
+          height: '100vh',
+          width: '100vw',
         }}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
@@ -140,24 +143,24 @@ const PropertySwipeCard: React.FC<PropertySwipeCardProps> = ({
         {swipeDirection && isActive && (
           <>
             {swipeDirection === 'right' && (
-              <div className="absolute inset-0 bg-green-500/20 backdrop-blur-sm z-50 flex items-center justify-center animate-pulse">
-                <div className="bg-green-500 rounded-full p-4 shadow-2xl animate-bounce">
-                  <Heart className="w-12 h-12 text-white" />
+              <div className="absolute inset-0 bg-green-500/30 backdrop-blur-sm z-50 flex items-center justify-center animate-pulse">
+                <div className="bg-green-500 rounded-full p-6 shadow-2xl animate-bounce">
+                  <Heart className="w-16 h-16 text-white" />
                 </div>
               </div>
             )}
             {swipeDirection === 'left' && (
-              <div className="absolute inset-0 bg-red-500/20 backdrop-blur-sm z-50 flex items-center justify-center animate-pulse">
-                <div className="bg-red-500 rounded-full p-4 shadow-2xl animate-bounce">
-                  <X className="w-12 h-12 text-white" />
+              <div className="absolute inset-0 bg-red-500/30 backdrop-blur-sm z-50 flex items-center justify-center animate-pulse">
+                <div className="bg-red-500 rounded-full p-6 shadow-2xl animate-bounce">
+                  <X className="w-16 h-16 text-white" />
                 </div>
               </div>
             )}
           </>
         )}
 
-        {/* Property Image */}
-        <div className="relative h-[400px] overflow-hidden">
+        {/* Full Screen Property Image */}
+        <div className="relative h-full overflow-hidden">
           <img 
             src={property.image} 
             alt={property.title}
@@ -165,71 +168,67 @@ const PropertySwipeCard: React.FC<PropertySwipeCardProps> = ({
             draggable={false}
           />
           
-          {/* Gradient Overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+          {/* Enhanced Gradient Overlay for better text readability */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/40" />
           
-          {/* Status Badge */}
-          <div className="absolute top-4 left-4">
-            <Badge className="bg-green-500 hover:bg-green-600 text-white border-0 px-3 py-1 text-xs font-medium shadow-lg">
-              Available
+          {/* Top Status Bar */}
+          <div className="absolute top-8 left-6 right-6 flex justify-between items-center z-40">
+            <Badge className="bg-green-500 hover:bg-green-600 text-white border-0 px-4 py-2 text-sm font-medium shadow-xl">
+              Available Now
             </Badge>
-          </div>
-
-          {/* Rating Badge */}
-          <div className="absolute top-4 right-4">
-            <div className="bg-black/50 backdrop-blur-sm rounded-full px-3 py-1 flex items-center space-x-1">
-              <Star className="w-3 h-3 text-yellow-400 fill-current" />
-              <span className="text-white text-xs font-medium">{property.rating}</span>
+            <div className="bg-black/60 backdrop-blur-md rounded-full px-4 py-2 flex items-center space-x-2">
+              <Star className="w-4 h-4 text-yellow-400 fill-current" />
+              <span className="text-white text-sm font-medium">{property.rating}</span>
+              <span className="text-white/70 text-xs">({property.reviews})</span>
             </div>
           </div>
 
-          {/* Property Basic Info Overlay */}
-          <div className="absolute bottom-4 left-4 right-4">
-            <h3 className="text-white text-xl font-bold mb-2">{property.title}</h3>
-            <div className="flex items-center text-white/90 text-sm mb-2">
-              <MapPin className="w-4 h-4 mr-1" />
-              <span>{property.location}</span>
+          {/* Main Property Info - Centered */}
+          <div className="absolute inset-x-6 top-1/2 transform -translate-y-1/2 text-center z-40">
+            <h1 className="text-white text-4xl font-bold mb-4 drop-shadow-2xl">
+              {property.title}
+            </h1>
+            <div className="flex items-center justify-center text-white text-lg mb-4">
+              <MapPin className="w-5 h-5 mr-2" />
+              <span className="drop-shadow-lg">{property.location}</span>
             </div>
-            <div className="text-white text-lg font-bold">
-              KSh {property.rent.toLocaleString()}/month
+            <div className="text-white text-3xl font-bold mb-6 drop-shadow-2xl">
+              KSh {property.rent.toLocaleString()}
+              <span className="text-lg font-normal text-white/90">/month</span>
             </div>
-          </div>
-        </div>
-
-        {/* Property Details */}
-        <CardContent className="p-6 space-y-4 bg-white">
-          {/* Property Type */}
-          <div className="flex items-center justify-between">
-            <Badge variant="outline" className="text-blue-600 border-blue-200 bg-blue-50">
+            <Badge variant="outline" className="text-white border-white/50 bg-white/10 backdrop-blur-sm text-lg px-6 py-2">
               {property.type}
             </Badge>
-            <div className="text-xs text-gray-500 flex items-center">
-              <Star className="w-3 h-3 mr-1" />
-              {property.reviews} reviews
-            </div>
           </div>
 
-          {/* Features */}
-          <div>
-            <h4 className="text-sm font-semibold text-gray-700 mb-2">Features</h4>
-            <div className="flex flex-wrap gap-2">
-              {property.features.slice(0, 4).map((feature, idx) => (
-                <div
-                  key={idx}
-                  className="flex items-center space-x-1 bg-gray-50 rounded-full px-3 py-1 text-xs text-gray-600"
-                >
-                  {getFeatureIcon(feature)}
-                  <span>{feature}</span>
-                </div>
-              ))}
+          {/* Bottom Property Details */}
+          <div className="absolute bottom-8 left-6 right-6 z-40">
+            <div className="bg-black/60 backdrop-blur-md rounded-3xl p-6">
+              <h4 className="text-white text-lg font-semibold mb-4 flex items-center">
+                <span className="w-2 h-2 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full mr-3"></span>
+                Features & Amenities
+              </h4>
+              <div className="grid grid-cols-2 gap-3">
+                {property.features.map((feature, idx) => (
+                  <div
+                    key={idx}
+                    className="flex items-center space-x-3 bg-white/10 backdrop-blur-sm rounded-xl px-4 py-3 text-white"
+                  >
+                    {getFeatureIcon(feature)}
+                    <span className="text-sm font-medium">{feature}</span>
+                  </div>
+                ))}
+              </div>
               {property.features.length > 4 && (
-                <div className="bg-gray-100 rounded-full px-3 py-1 text-xs text-gray-500">
-                  +{property.features.length - 4} more
+                <div className="mt-3 text-center">
+                  <span className="text-white/80 text-sm">
+                    +{property.features.length - 4} more amenities
+                  </span>
                 </div>
               )}
             </div>
           </div>
-        </CardContent>
+        </div>
       </Card>
     </div>
   );

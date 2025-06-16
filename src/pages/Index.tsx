@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Search, Filter, MapPin, Plus, User, Heart, X, Star, Info, Sparkles } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
@@ -125,8 +124,8 @@ const Index = () => {
         <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-blue-400/20 to-cyan-400/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
       </div>
 
-      {/* Enhanced Mobile Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-xl border-b border-white/20 shadow-lg">
+      {/* Enhanced Mobile Header - Fixed at top */}
+      <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-xl border-b border-white/20 shadow-lg">
         <div className="px-4 py-4">
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-3">
@@ -170,7 +169,7 @@ const Index = () => {
 
       {/* Welcome Message for First Time Users */}
       {isFirstTime && hasMoreProperties && (
-        <div className="fixed top-24 left-4 right-4 z-40 animate-slide-in-right">
+        <div className="fixed top-24 left-4 right-4 z-50 animate-slide-in-right">
           <Card className="bg-gradient-to-r from-purple-500 to-pink-500 border-0 shadow-2xl">
             <CardContent className="p-4 text-center">
               <div className="flex justify-center mb-2">
@@ -185,133 +184,129 @@ const Index = () => {
         </div>
       )}
 
-      {/* Main Content */}
-      <div className="pt-28 pb-32 px-4 min-h-screen flex flex-col">
-        {hasMoreProperties ? (
-          <div className="flex-1 flex items-center justify-center">
-            <div className="relative w-full max-w-sm mx-auto">
-              {/* Property Stack with Enhanced Animation */}
-              <div className="relative">
-                {filteredProperties.slice(currentPropertyIndex, currentPropertyIndex + 3).map((property, index) => (
-                  <div
-                    key={property.id}
-                    className={`absolute inset-0 transition-all duration-500 ease-out ${
-                      index === 0 ? 'z-30 scale-100' : 
-                      index === 1 ? 'z-20 scale-95 translate-y-2' : 
-                      'z-10 scale-90 translate-y-4'
-                    }`}
-                    style={{
-                      transform: `scale(${1 - index * 0.05}) translateY(${index * 8}px)`,
-                      opacity: 1 - index * 0.2
-                    }}
-                  >
-                    <PropertySwipeCard
-                      property={property}
-                      index={index}
-                      onSwipe={handleSwipe}
-                      isActive={index === 0}
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        ) : (
-          <div className="flex-1 flex items-center justify-center">
-            <div className="text-center py-8 animate-scale-in">
-              <div className="relative mb-6">
-                <div className="w-24 h-24 bg-gradient-to-br from-pink-500 via-purple-500 to-blue-500 rounded-full flex items-center justify-center mx-auto shadow-2xl">
-                  <Heart className="w-12 h-12 text-white animate-pulse" />
-                </div>
-                <div className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full flex items-center justify-center animate-bounce">
-                  <Sparkles className="w-4 h-4 text-white" />
-                </div>
-              </div>
-              <h3 className="text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-3">
-                That's all for now!
-              </h3>
-              <p className="text-gray-600 mb-8 leading-relaxed px-4">
-                You've seen all available properties matching your filters. Check back later for new listings!
-              </p>
-              <div className="space-y-3">
-                <Button 
-                  onClick={resetStack}
-                  className="bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 hover:from-pink-600 hover:via-purple-600 hover:to-blue-600 text-white rounded-2xl px-8 py-4 text-base font-semibold shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105"
-                >
-                  <Heart className="w-5 h-5 mr-2" />
-                  Start Over
-                </Button>
-                <Button 
-                  onClick={() => setShowOnboarding(true)}
-                  variant="outline"
-                  className="rounded-2xl px-8 py-4 text-base font-semibold border-2 border-purple-200 hover:bg-purple-50 transition-all duration-300 hover:scale-105"
-                >
-                  <User className="w-5 h-5 mr-2" />
-                  Complete Profile
-                </Button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Enhanced Action Buttons */}
-        {hasMoreProperties && (
-          <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 flex items-center justify-center space-x-8 z-40">
-            <Button
-              onClick={() => currentProperty && handleSwipe('left', currentProperty.id)}
-              className="w-16 h-16 rounded-full bg-white shadow-2xl hover:shadow-3xl border-0 hover:scale-110 transition-all duration-300 group"
-              variant="ghost"
-            >
-              <X className="w-7 h-7 text-red-500 group-hover:scale-110 transition-transform duration-200" />
-            </Button>
-            
-            <Link to={currentProperty ? `/property/${currentProperty.id}` : '#'}>
-              <Button className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-100 to-purple-100 shadow-xl hover:shadow-2xl border-0 hover:scale-110 transition-all duration-300 group" variant="ghost">
-                <Info className="w-6 h-6 text-blue-600 group-hover:scale-110 transition-transform duration-200" />
-              </Button>
-            </Link>
-            
-            <Button
-              onClick={() => currentProperty && handleSwipe('right', currentProperty.id)}
-              className="w-16 h-16 rounded-full bg-gradient-to-r from-pink-500 via-red-500 to-pink-500 shadow-2xl hover:shadow-3xl hover:scale-110 transition-all duration-300 group relative overflow-hidden"
-            >
-              <div className="absolute inset-0 bg-gradient-to-r from-pink-400 via-red-400 to-pink-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              <Heart className="w-7 h-7 text-white group-hover:scale-110 transition-transform duration-200 relative z-10" />
-            </Button>
-          </div>
-        )}
-
-        {/* Enhanced Match Counter */}
-        {hasMoreProperties && likedProperties.length > 0 && (
-          <div className="fixed top-32 right-4 z-40 animate-bounce">
-            <div className="bg-gradient-to-r from-pink-500 to-red-500 text-white rounded-full px-4 py-2 shadow-xl flex items-center space-x-2">
-              <Heart className="w-4 h-4 animate-pulse" />
-              <span className="text-sm font-bold">{likedProperties.length}</span>
-              <Sparkles className="w-4 h-4" />
-            </div>
-          </div>
-        )}
-
-        {/* Progress Indicator */}
-        {hasMoreProperties && (
-          <div className="fixed bottom-32 left-1/2 transform -translate-x-1/2 z-30">
-            <div className="flex space-x-2">
-              {filteredProperties.slice(0, Math.min(5, filteredProperties.length)).map((_, index) => (
-                <div
-                  key={index}
-                  className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                    index === currentPropertyIndex 
-                      ? 'bg-gradient-to-r from-pink-500 to-purple-500 scale-125' 
-                      : index < currentPropertyIndex 
-                        ? 'bg-gray-400' 
-                        : 'bg-gray-200'
-                  }`}
+      {/* Main Content - Full Screen Cards */}
+      {hasMoreProperties ? (
+        <div className="h-screen w-full">
+          {/* Property Stack with Full Screen Cards */}
+          <div className="relative h-full w-full">
+            {filteredProperties.slice(currentPropertyIndex, currentPropertyIndex + 3).map((property, index) => (
+              <div
+                key={property.id}
+                className={`absolute inset-0 transition-all duration-500 ease-out ${
+                  index === 0 ? 'z-30 scale-100' : 
+                  index === 1 ? 'z-20 scale-95' : 
+                  'z-10 scale-90'
+                }`}
+                style={{
+                  transform: `scale(${1 - index * 0.02}) translateX(${index * 4}px)`,
+                  opacity: 1 - index * 0.1
+                }}
+              >
+                <PropertySwipeCard
+                  property={property}
+                  index={index}
+                  onSwipe={handleSwipe}
+                  isActive={index === 0}
                 />
-              ))}
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <div className="h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50">
+          <div className="text-center py-8 animate-scale-in px-6">
+            <div className="relative mb-6">
+              <div className="w-24 h-24 bg-gradient-to-br from-pink-500 via-purple-500 to-blue-500 rounded-full flex items-center justify-center mx-auto shadow-2xl">
+                <Heart className="w-12 h-12 text-white animate-pulse" />
+              </div>
+              <div className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full flex items-center justify-center animate-bounce">
+                <Sparkles className="w-4 h-4 text-white" />
+              </div>
+            </div>
+            <h3 className="text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-3">
+              That's all for now!
+            </h3>
+            <p className="text-gray-600 mb-8 leading-relaxed px-4">
+              You've seen all available properties matching your filters. Check back later for new listings!
+            </p>
+            <div className="space-y-3">
+              <Button 
+                onClick={resetStack}
+                className="bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 hover:from-pink-600 hover:via-purple-600 hover:to-blue-600 text-white rounded-2xl px-8 py-4 text-base font-semibold shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105"
+              >
+                <Heart className="w-5 h-5 mr-2" />
+                Start Over
+              </Button>
+              <Button 
+                onClick={() => setShowOnboarding(true)}
+                variant="outline"
+                className="rounded-2xl px-8 py-4 text-base font-semibold border-2 border-purple-200 hover:bg-purple-50 transition-all duration-300 hover:scale-105"
+              >
+                <User className="w-5 h-5 mr-2" />
+                Complete Profile
+              </Button>
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
+
+      {/* Enhanced Action Buttons - Fixed at bottom */}
+      {hasMoreProperties && (
+        <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 flex items-center justify-center space-x-8 z-50">
+          <Button
+            onClick={() => currentProperty && handleSwipe('left', currentProperty.id)}
+            className="w-16 h-16 rounded-full bg-white shadow-2xl hover:shadow-3xl border-0 hover:scale-110 transition-all duration-300 group"
+            variant="ghost"
+          >
+            <X className="w-7 h-7 text-red-500 group-hover:scale-110 transition-transform duration-200" />
+          </Button>
+          
+          <Link to={currentProperty ? `/property/${currentProperty.id}` : '#'}>
+            <Button className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-100 to-purple-100 shadow-xl hover:shadow-2xl border-0 hover:scale-110 transition-all duration-300 group" variant="ghost">
+              <Info className="w-6 h-6 text-blue-600 group-hover:scale-110 transition-transform duration-200" />
+            </Button>
+          </Link>
+          
+          <Button
+            onClick={() => currentProperty && handleSwipe('right', currentProperty.id)}
+            className="w-16 h-16 rounded-full bg-gradient-to-r from-pink-500 via-red-500 to-pink-500 shadow-2xl hover:shadow-3xl hover:scale-110 transition-all duration-300 group relative overflow-hidden"
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-pink-400 via-red-400 to-pink-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <Heart className="w-7 h-7 text-white group-hover:scale-110 transition-transform duration-200 relative z-10" />
+          </Button>
+        </div>
+      )}
+
+      {/* Enhanced Match Counter */}
+      {hasMoreProperties && likedProperties.length > 0 && (
+        <div className="fixed top-32 right-4 z-50 animate-bounce">
+          <div className="bg-gradient-to-r from-pink-500 to-red-500 text-white rounded-full px-4 py-2 shadow-xl flex items-center space-x-2">
+            <Heart className="w-4 h-4 animate-pulse" />
+            <span className="text-sm font-bold">{likedProperties.length}</span>
+            <Sparkles className="w-4 h-4" />
+          </div>
+        </div>
+      )}
+
+      {/* Progress Indicator */}
+      {hasMoreProperties && (
+        <div className="fixed bottom-32 left-1/2 transform -translate-x-1/2 z-50">
+          <div className="flex space-x-2">
+            {filteredProperties.slice(0, Math.min(5, filteredProperties.length)).map((_, index) => (
+              <div
+                key={index}
+                className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                  index === currentPropertyIndex 
+                    ? 'bg-gradient-to-r from-pink-500 to-purple-500 scale-125' 
+                    : index < currentPropertyIndex 
+                      ? 'bg-gray-400' 
+                      : 'bg-gray-200'
+                }`}
+              />
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Filters Modal */}
       <PropertyFilters 
