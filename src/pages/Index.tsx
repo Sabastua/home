@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { Search, Filter, MapPin, Plus, User, Heart, X, Star, Info, Sparkles } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -83,12 +84,25 @@ const Index = () => {
   const [currentPropertyIndex, setCurrentPropertyIndex] = useState(0);
   const [likedProperties, setLikedProperties] = useState<number[]>([]);
   const [isFirstTime, setIsFirstTime] = useState(true);
+  const [isDesktop, setIsDesktop] = useState(false);
   const [filters, setFilters] = useState({
     type: "All",
     location: "All",
     maxRent: 50000,
     minRent: 0
   });
+
+  // Check if device is desktop
+  useEffect(() => {
+    const checkIsDesktop = () => {
+      setIsDesktop(window.innerWidth >= 1024);
+    };
+    
+    checkIsDesktop();
+    window.addEventListener('resize', checkIsDesktop);
+    
+    return () => window.removeEventListener('resize', checkIsDesktop);
+  }, []);
 
   const filteredProperties = properties.filter(property => {
     const matchesType = filters.type === "All" || property.type === filters.type;
@@ -102,10 +116,12 @@ const Index = () => {
       setLikedProperties(prev => [...prev, propertyId]);
     }
     
-    setTimeout(() => {
-      setCurrentPropertyIndex(prev => prev + 1);
-      setIsFirstTime(false);
-    }, 300);
+    if (!isDesktop) {
+      setTimeout(() => {
+        setCurrentPropertyIndex(prev => prev + 1);
+        setIsFirstTime(false);
+      }, 300);
+    }
   };
 
   const resetStack = () => {
@@ -116,6 +132,135 @@ const Index = () => {
   const currentProperty = filteredProperties[currentPropertyIndex];
   const hasMoreProperties = currentPropertyIndex < filteredProperties.length;
 
+  // Desktop Grid Layout
+  if (isDesktop) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50">
+        {/* Animated Background Elements */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-pink-400/20 to-purple-400/20 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-blue-400/20 to-cyan-400/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        </div>
+
+        {/* Desktop Header */}
+        <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-xl border-b border-white/20 shadow-lg">
+          <div className="max-w-7xl mx-auto px-6 py-4">
+            <div className="flex justify-between items-center">
+              <div className="flex items-center space-x-4">
+                <div className="relative">
+                  <div className="w-12 h-12 bg-gradient-to-br from-pink-500 via-purple-500 to-blue-500 rounded-2xl flex items-center justify-center shadow-xl">
+                    <span className="text-white font-bold text-lg">NH</span>
+                  </div>
+                  <div className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-r from-green-400 to-emerald-400 rounded-full animate-pulse"></div>
+                </div>
+                <div>
+                  <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
+                    Nakuru Homes
+                  </h1>
+                  <p className="text-sm text-gray-500 flex items-center">
+                    <Sparkles className="w-4 h-4 mr-1 text-yellow-500" />
+                    Discover your perfect home
+                  </p>
+                </div>
+              </div>
+              
+              {/* Desktop Search and Filters */}
+              <div className="flex-1 max-w-md mx-8">
+                <div className="relative">
+                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <Input 
+                    placeholder="Search properties..." 
+                    className="pl-12 pr-4 py-3 rounded-2xl border-gray-200 bg-white/90 backdrop-blur-sm"
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center space-x-3">
+                <Button 
+                  variant="ghost" 
+                  onClick={() => setShowFilters(true)}
+                  className="px-6 py-3 rounded-2xl bg-gradient-to-br from-gray-100 to-gray-200 hover:from-gray-200 hover:to-gray-300 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+                >
+                  <Filter className="w-5 h-5 mr-2 text-gray-700" />
+                  Filters
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  onClick={() => setShowOnboarding(true)}
+                  className="px-6 py-3 rounded-2xl bg-gradient-to-br from-blue-100 to-purple-100 hover:from-blue-200 hover:to-purple-200 text-blue-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+                >
+                  <User className="w-5 h-5 mr-2" />
+                  Profile
+                </Button>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        {/* Desktop Property Grid */}
+        <main className="max-w-7xl mx-auto px-6 py-8">
+          {filteredProperties.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {filteredProperties.map((property, index) => (
+                <div 
+                  key={property.id} 
+                  className="h-96 animate-fade-in"
+                  style={{ animationDelay: `${index * 100}ms` }}
+                >
+                  <PropertySwipeCard
+                    property={property}
+                    index={index}
+                    onSwipe={handleSwipe}
+                    isActive={true}
+                    isDesktop={true}
+                  />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-16">
+              <div className="relative mb-8">
+                <div className="w-24 h-24 bg-gradient-to-br from-pink-500 via-purple-500 to-blue-500 rounded-full flex items-center justify-center mx-auto shadow-2xl">
+                  <Heart className="w-12 h-12 text-white animate-pulse" />
+                </div>
+                <div className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full flex items-center justify-center animate-bounce">
+                  <Sparkles className="w-4 h-4 text-white" />
+                </div>
+              </div>
+              <h3 className="text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-4">
+                No properties found
+              </h3>
+              <p className="text-gray-600 mb-8 text-lg">
+                Try adjusting your filters to see more properties
+              </p>
+              <Button 
+                onClick={() => setShowFilters(true)}
+                className="bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 hover:from-pink-600 hover:via-purple-600 hover:to-blue-600 text-white rounded-2xl px-8 py-4 text-base font-semibold shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105"
+              >
+                <Filter className="w-5 h-5 mr-2" />
+                Adjust Filters
+              </Button>
+            </div>
+          )}
+        </main>
+
+        {/* Liked Properties Counter for Desktop */}
+        {likedProperties.length > 0 && (
+          <div className="fixed top-6 right-6 z-50">
+            <Link to="/favorites">
+              <div className="bg-gradient-to-r from-pink-500 to-red-500 text-white rounded-2xl px-6 py-3 shadow-xl flex items-center space-x-3 hover:shadow-2xl transition-all duration-300 hover:scale-105">
+                <Heart className="w-5 h-5 animate-pulse" />
+                <span className="font-bold">{likedProperties.length} Liked</span>
+                <Sparkles className="w-5 h-5" />
+              </div>
+            </Link>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // Mobile Layout (existing code)
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 relative overflow-hidden">
       {/* Animated Background Elements */}
@@ -207,6 +352,7 @@ const Index = () => {
                   index={index}
                   onSwipe={handleSwipe}
                   isActive={index === 0}
+                  isDesktop={false}
                 />
               </div>
             ))}

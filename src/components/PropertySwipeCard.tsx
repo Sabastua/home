@@ -23,13 +23,15 @@ interface PropertySwipeCardProps {
   index: number;
   onSwipe: (direction: 'left' | 'right', propertyId: number) => void;
   isActive: boolean;
+  isDesktop?: boolean;
 }
 
 const PropertySwipeCard: React.FC<PropertySwipeCardProps> = ({
   property,
   index,
   onSwipe,
-  isActive
+  isActive,
+  isDesktop = false
 }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
@@ -48,13 +50,13 @@ const PropertySwipeCard: React.FC<PropertySwipeCardProps> = ({
   };
 
   const handleStart = (clientX: number, clientY: number) => {
-    if (!isActive) return;
+    if (!isActive || isDesktop) return;
     setIsDragging(true);
     startPos.current = { x: clientX, y: clientY };
   };
 
   const handleMove = (clientX: number, clientY: number) => {
-    if (!isDragging || !isActive) return;
+    if (!isDragging || !isActive || isDesktop) return;
     
     const deltaX = clientX - startPos.current.x;
     const deltaY = clientY - startPos.current.y;
@@ -69,7 +71,7 @@ const PropertySwipeCard: React.FC<PropertySwipeCardProps> = ({
   };
 
   const handleEnd = () => {
-    if (!isDragging || !isActive) return;
+    if (!isDragging || !isActive || isDesktop) return;
     
     setIsDragging(false);
     
@@ -110,8 +112,120 @@ const PropertySwipeCard: React.FC<PropertySwipeCardProps> = ({
     handleEnd();
   };
 
-  const rotation = isActive ? dragOffset.x * 0.1 : 0;
-  const opacity = isActive ? Math.max(0.7, 1 - Math.abs(dragOffset.x) / 300) : 1;
+  const rotation = isActive && !isDesktop ? dragOffset.x * 0.1 : 0;
+  const opacity = isActive && !isDesktop ? Math.max(0.7, 1 - Math.abs(dragOffset.x) / 300) : 1;
+
+  if (isDesktop) {
+    // Desktop grid card layout
+    return (
+      <Card className="w-full h-full overflow-hidden border-0 shadow-xl hover:shadow-2xl transition-all duration-300 rounded-3xl hover:scale-105 group">
+        {/* Property Card Content */}
+        <div className="relative h-full overflow-hidden rounded-3xl">
+          {/* High Quality Property Image */}
+          <div className="relative h-3/5 overflow-hidden rounded-t-3xl">
+            <img 
+              src={property.image} 
+              alt={property.title}
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+              draggable={false}
+              loading="eager"
+              style={{
+                objectFit: 'cover',
+                objectPosition: 'center'
+              }}
+            />
+            
+            {/* Subtle Gradient Overlay */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/20" />
+            
+            {/* Top Status Bar */}
+            <div className="absolute top-4 left-4 right-4 flex justify-between items-center z-40">
+              <Badge className="bg-green-500 hover:bg-green-600 text-white border-0 px-3 py-1 text-xs font-medium shadow-lg">
+                Available Now
+              </Badge>
+              <div className="bg-white/90 backdrop-blur-md rounded-full px-3 py-1 flex items-center space-x-1 shadow-lg">
+                <Star className="w-3 h-3 text-yellow-500 fill-current" />
+                <span className="text-gray-800 text-xs font-medium">{property.rating}</span>
+                <span className="text-gray-600 text-xs">({property.reviews})</span>
+              </div>
+            </div>
+
+            {/* Desktop Action Buttons */}
+            <div className="absolute bottom-4 right-4 flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <Button
+                onClick={() => onSwipe('left', property.id)}
+                className="w-10 h-10 rounded-full bg-white shadow-lg hover:shadow-xl border-0 hover:scale-110 transition-all duration-300"
+                variant="ghost"
+              >
+                <X className="w-5 h-5 text-red-500" />
+              </Button>
+              <Button
+                onClick={() => onSwipe('right', property.id)}
+                className="w-10 h-10 rounded-full bg-gradient-to-r from-pink-500 to-red-500 shadow-lg hover:shadow-xl hover:scale-110 transition-all duration-300"
+              >
+                <Heart className="w-5 h-5 text-white" />
+              </Button>
+            </div>
+          </div>
+
+          {/* Property Details Section */}
+          <div className="h-2/5 bg-white p-4 flex flex-col justify-between">
+            {/* Main Property Info */}
+            <div className="flex-1">
+              <div className="flex justify-between items-start mb-3">
+                <div>
+                  <h1 className="text-gray-900 text-lg font-bold mb-1">
+                    {property.title}
+                  </h1>
+                  <div className="flex items-center text-gray-600 mb-2">
+                    <MapPin className="w-4 h-4 mr-1" />
+                    <span className="text-sm">{property.location}</span>
+                  </div>
+                </div>
+                <Badge variant="outline" className="text-gray-700 border-gray-300 bg-gray-50 px-2 py-1 text-xs">
+                  {property.type}
+                </Badge>
+              </div>
+
+              {/* Price */}
+              <div className="mb-3">
+                <div className="text-xl font-bold text-gray-900">
+                  KSh {property.rent.toLocaleString()}
+                  <span className="text-sm font-normal text-gray-600">/month</span>
+                </div>
+              </div>
+
+              {/* Features */}
+              <div className="mb-2">
+                <h4 className="text-gray-800 text-xs font-semibold mb-2 flex items-center">
+                  <span className="w-1.5 h-1.5 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full mr-2"></span>
+                  Features & Amenities
+                </h4>
+                <div className="grid grid-cols-2 gap-1">
+                  {property.features.slice(0, 4).map((feature, idx) => (
+                    <div
+                      key={idx}
+                      className="flex items-center space-x-1 bg-gray-50 rounded-lg px-2 py-1 text-gray-700"
+                    >
+                      {getFeatureIcon(feature)}
+                      <span className="text-xs font-medium">{feature}</span>
+                    </div>
+                  ))}
+                </div>
+                {property.features.length > 4 && (
+                  <div className="mt-1 text-center">
+                    <span className="text-gray-500 text-xs">
+                      +{property.features.length - 4} more
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </Card>
+    );
+  }
 
   return (
     <div className="fixed inset-4 z-30">
@@ -166,7 +280,6 @@ const PropertySwipeCard: React.FC<PropertySwipeCardProps> = ({
               draggable={false}
               loading="eager"
               style={{
-                imageRendering: 'high-quality',
                 objectFit: 'cover',
                 objectPosition: 'center'
               }}
