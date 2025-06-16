@@ -184,18 +184,18 @@ const Index = () => {
         </div>
       )}
 
-      {/* Main Content - Full Screen Cards */}
+      {/* Main Content - Property Cards with Padding */}
       {hasMoreProperties ? (
-        <div className="h-screen w-full">
-          {/* Property Stack with Full Screen Cards */}
+        <div className="h-screen w-full pt-20 pb-4">
+          {/* Property Stack with Padded Cards */}
           <div className="relative h-full w-full">
             {filteredProperties.slice(currentPropertyIndex, currentPropertyIndex + 3).map((property, index) => (
               <div
                 key={property.id}
-                className={`absolute inset-0 transition-all duration-500 ease-out ${
-                  index === 0 ? 'z-30 scale-100' : 
-                  index === 1 ? 'z-20 scale-95' : 
-                  'z-10 scale-90'
+                className={`absolute transition-all duration-500 ease-out ${
+                  index === 0 ? 'z-30 scale-100 inset-0' : 
+                  index === 1 ? 'z-20 scale-95 inset-2' : 
+                  'z-10 scale-90 inset-4'
                 }`}
                 style={{
                   transform: `scale(${1 - index * 0.02}) translateX(${index * 4}px)`,
