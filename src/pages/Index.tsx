@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Search, Filter, MapPin, Plus, User, Heart, X, Star, Info, Sparkles } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
@@ -10,7 +9,7 @@ import OnboardingModal from '@/components/OnboardingModal';
 import PropertySwipeCard from '@/components/PropertySwipeCard';
 import PropertyFilters from '@/components/PropertyFilters';
 
-// Mock data for properties
+// Enhanced mock data for 10 properties
 const properties = [
   {
     id: 1,
@@ -40,7 +39,7 @@ const properties = [
       "https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=400&h=600&fit=crop",
       "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=600&fit=crop"
     ],
-    features: ["Furnished", "Water included"],
+    features: ["Furnished", "Water included", "WiFi", "Security"],
     available: true,
     rating: 4.2,
     reviews: 18
@@ -56,7 +55,7 @@ const properties = [
       "https://images.unsplash.com/photo-1487958449943-2429e8be8625?w=400&h=600&fit=crop",
       "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400&h=600&fit=crop"
     ],
-    features: ["Own Compound", "Garden", "Parking"],
+    features: ["Own Compound", "Garden", "Parking", "Security", "Generator"],
     available: true,
     rating: 4.9,
     reviews: 31
@@ -71,10 +70,107 @@ const properties = [
     images: [
       "https://images.unsplash.com/photo-1518005020951-eccb494ad742?w=400&h=600&fit=crop"
     ],
-    features: ["Modern", "Security", "Water included"],
+    features: ["Modern", "Security", "Water included", "WiFi"],
     available: true,
     rating: 4.5,
     reviews: 12
+  },
+  {
+    id: 5,
+    title: "Executive 4BR Villa",
+    type: "4BR",
+    location: "Milimani",
+    rent: 55000,
+    image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=400&h=600&fit=crop",
+    images: [
+      "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=400&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=400&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=400&h=600&fit=crop"
+    ],
+    features: ["Swimming Pool", "Garden", "Parking", "Security", "Generator", "WiFi", "Gym"],
+    available: true,
+    rating: 4.9,
+    reviews: 45
+  },
+  {
+    id: 6,
+    title: "1BR Garden Apartment",
+    type: "1BR",
+    location: "Section 58",
+    rent: 18000,
+    image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=400&h=600&fit=crop",
+    images: [
+      "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=400&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1484154218962-a197022b5858?w=400&h=600&fit=crop"
+    ],
+    features: ["Garden View", "Parking", "Security", "Water included", "WiFi"],
+    available: true,
+    rating: 4.3,
+    reviews: 16
+  },
+  {
+    id: 7,
+    title: "Modern 3BR Penthouse",
+    type: "3BR",
+    location: "Nakuru East",
+    rent: 42000,
+    image: "https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=400&h=600&fit=crop",
+    images: [
+      "https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=400&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=400&h=600&fit=crop"
+    ],
+    features: ["Rooftop Terrace", "Modern Kitchen", "Parking", "Security", "Generator", "WiFi"],
+    available: true,
+    rating: 4.7,
+    reviews: 28
+  },
+  {
+    id: 8,
+    title: "Affordable Bedsitter",
+    type: "Bedsitter",
+    location: "Kaptembwo",
+    rent: 6500,
+    image: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&h=600&fit=crop",
+    images: [
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&h=600&fit=crop"
+    ],
+    features: ["Water included", "Security", "Parking"],
+    available: true,
+    rating: 4.0,
+    reviews: 9
+  },
+  {
+    id: 9,
+    title: "Family 2BR Duplex",
+    type: "2BR",
+    location: "Bahati",
+    rent: 22000,
+    image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400&h=600&fit=crop",
+    images: [
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1600573472550-8090b5e0745e?w=400&h=600&fit=crop"
+    ],
+    features: ["Duplex Design", "Garden", "Parking", "Security", "Water included", "WiFi"],
+    available: true,
+    rating: 4.6,
+    reviews: 22
+  },
+  {
+    id: 10,
+    title: "Luxury 5BR Mansion",
+    type: "5BR",
+    location: "Upperhill",
+    rent: 85000,
+    image: "https://images.unsplash.com/photo-1600607687644-aac4c3eac7f4?w=400&h=600&fit=crop",
+    images: [
+      "https://images.unsplash.com/photo-1600607687644-aac4c3eac7f4?w=400&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?w=400&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1600607688969-a5bfcd646154?w=400&h=600&fit=crop"
+    ],
+    features: ["Swimming Pool", "Garden", "Parking", "Security", "Generator", "WiFi", "Gym", "Sauna", "Study Room"],
+    available: true,
+    rating: 5.0,
+    reviews: 67
   }
 ];
 
@@ -88,7 +184,7 @@ const Index = () => {
   const [filters, setFilters] = useState({
     type: "All",
     location: "All",
-    maxRent: 50000,
+    maxRent: 90000,
     minRent: 0
   });
 

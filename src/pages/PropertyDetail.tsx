@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { MapPin, Calendar, Check, ArrowLeft, Phone, Mail, Home, Wifi, Car, Shield, Building2, MessageCircle, Eye, Heart, User } from 'lucide-react';
@@ -7,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 
-// Mock property data with agent and office information
+// Enhanced property data with comprehensive information for all 10 properties
 const propertyData = {
   1: {
     id: 1,
@@ -18,9 +17,9 @@ const propertyData = {
     images: [
       "https://images.unsplash.com/photo-1721322800607-8c38375eef04?w=800&h=600&fit=crop",
       "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1484154218962-a197022b5858?w=800&h=600&fit=crop"
+      "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&h=600&fit=crop"
     ],
-    features: ["Water included", "Parking", "Security", "Modern Kitchen", "Balcony"],
+    features: ["Water included", "Parking", "Security", "Modern Kitchen", "Balcony", "WiFi", "Generator"],
     description: "A beautiful modern 2-bedroom apartment located in the heart of Nakuru Town. Features include a spacious living room, modern kitchen with fitted cabinets, two comfortable bedrooms, and a private balcony with town views.",
     agent: {
       name: "Sarah Wanjiku",
@@ -38,24 +37,9 @@ const propertyData = {
       hours: "Mon-Fri: 8AM-6PM, Sat: 9AM-3PM"
     },
     branches: [
-      {
-        name: "Lanet Branch",
-        address: "Lanet Shopping Center",
-        phone: "+254 712 345 679",
-        manager: "James Kimani"
-      },
-      {
-        name: "Njoro Branch", 
-        address: "Njoro Town Center",
-        phone: "+254 712 345 680",
-        manager: "Grace Muthoni"
-      },
-      {
-        name: "Rongai Branch",
-        address: "Rongai Market Road",
-        phone: "+254 712 345 681",
-        manager: "Peter Kiprotich"
-      }
+      { name: "Lanet Branch", address: "Lanet Shopping Center", phone: "+254 712 345 679", manager: "James Kimani" },
+      { name: "Njoro Branch", address: "Njoro Town Center", phone: "+254 712 345 680", manager: "Grace Muthoni" },
+      { name: "Rongai Branch", address: "Rongai Market Road", phone: "+254 712 345 681", manager: "Peter Kiprotich" }
     ],
     payment: {
       paybill: "522533",
@@ -64,6 +48,366 @@ const propertyData = {
     },
     available: true,
     dateAvailable: "2024-07-01"
+  },
+  2: {
+    id: 2,
+    title: "Cozy Bedsitter",
+    type: "Bedsitter",
+    location: "Lanet",
+    rent: 8000,
+    images: [
+      "https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=800&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&h=600&fit=crop"
+    ],
+    features: ["Furnished", "Water included", "WiFi", "Security"],
+    description: "A cozy bedsitter perfect for students and young professionals. Fully furnished with modern amenities and located in the quiet neighborhood of Lanet.",
+    agent: {
+      name: "James Kimani",
+      phone: "+254 712 345 679",
+      email: "james.kimani@nakuruhomes.com",
+      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+      experience: "3+ years",
+      rating: 4.5
+    },
+    office: {
+      name: "Nakuru HomesConnect - Lanet Branch",
+      address: "Lanet Shopping Center",
+      phone: "+254 712 345 679",
+      email: "lanet@nakuruhomes.com",
+      hours: "Mon-Fri: 8AM-6PM, Sat: 9AM-3PM"
+    },
+    branches: [
+      { name: "Head Office", address: "Kenyatta Avenue, Nakuru Town", phone: "+254 712 345 678", manager: "Sarah Wanjiku" },
+      { name: "Njoro Branch", address: "Njoro Town Center", phone: "+254 712 345 680", manager: "Grace Muthoni" },
+      { name: "Rongai Branch", address: "Rongai Market Road", phone: "+254 712 345 681", manager: "Peter Kiprotich" }
+    ],
+    payment: {
+      paybill: "522533",
+      accountNumber: "HOUSE002",
+      businessName: "Nakuru HomesConnect Ltd"
+    },
+    available: true,
+    dateAvailable: "2024-06-15"
+  },
+  3: {
+    id: 3,
+    title: "Spacious 3BR House",
+    type: "3BR",
+    location: "Njoro",
+    rent: 35000,
+    images: [
+      "https://images.unsplash.com/photo-1487958449943-2429e8be8625?w=800&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&h=600&fit=crop"
+    ],
+    features: ["Own Compound", "Garden", "Parking", "Security", "Generator"],
+    description: "A spacious 3-bedroom house with its own compound and beautiful garden. Perfect for families looking for privacy and space in the serene environment of Njoro.",
+    agent: {
+      name: "Grace Muthoni",
+      phone: "+254 712 345 680",
+      email: "grace.muthoni@nakuruhomes.com",
+      image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
+      experience: "6+ years",
+      rating: 4.9
+    },
+    office: {
+      name: "Nakuru HomesConnect - Njoro Branch",
+      address: "Njoro Town Center",
+      phone: "+254 712 345 680",
+      email: "njoro@nakuruhomes.com",
+      hours: "Mon-Fri: 8AM-6PM, Sat: 9AM-3PM"
+    },
+    branches: [
+      { name: "Head Office", address: "Kenyatta Avenue, Nakuru Town", phone: "+254 712 345 678", manager: "Sarah Wanjiku" },
+      { name: "Lanet Branch", address: "Lanet Shopping Center", phone: "+254 712 345 679", manager: "James Kimani" },
+      { name: "Rongai Branch", address: "Rongai Market Road", phone: "+254 712 345 681", manager: "Peter Kiprotich" }
+    ],
+    payment: {
+      paybill: "522533",
+      accountNumber: "HOUSE003",
+      businessName: "Nakuru HomesConnect Ltd"
+    },
+    available: true,
+    dateAvailable: "2024-07-15"
+  },
+  4: {
+    id: 4,
+    title: "Studio Apartment",
+    type: "Studio",
+    location: "Rongai",
+    rent: 12000,
+    images: [
+      "https://images.unsplash.com/photo-1518005020951-eccb494ad742?w=800&h=600&fit=crop"
+    ],
+    features: ["Modern", "Security", "Water included", "WiFi"],
+    description: "A modern studio apartment perfect for young professionals. Located in Rongai with easy access to town and modern amenities.",
+    agent: {
+      name: "Peter Kiprotich",
+      phone: "+254 712 345 681",
+      email: "peter.kiprotich@nakuruhomes.com",
+      image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+      experience: "4+ years",
+      rating: 4.6
+    },
+    office: {
+      name: "Nakuru HomesConnect - Rongai Branch",
+      address: "Rongai Market Road",
+      phone: "+254 712 345 681",
+      email: "rongai@nakuruhomes.com",
+      hours: "Mon-Fri: 8AM-6PM, Sat: 9AM-3PM"
+    },
+    branches: [
+      { name: "Head Office", address: "Kenyatta Avenue, Nakuru Town", phone: "+254 712 345 678", manager: "Sarah Wanjiku" },
+      { name: "Lanet Branch", address: "Lanet Shopping Center", phone: "+254 712 345 679", manager: "James Kimani" },
+      { name: "Njoro Branch", address: "Njoro Town Center", phone: "+254 712 345 680", manager: "Grace Muthoni" }
+    ],
+    payment: {
+      paybill: "522533",
+      accountNumber: "HOUSE004",
+      businessName: "Nakuru HomesConnect Ltd"
+    },
+    available: true,
+    dateAvailable: "2024-06-20"
+  },
+  5: {
+    id: 5,
+    title: "Executive 4BR Villa",
+    type: "4BR",
+    location: "Milimani",
+    rent: 55000,
+    images: [
+      "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=800&h=600&fit=crop"
+    ],
+    features: ["Swimming Pool", "Garden", "Parking", "Security", "Generator", "WiFi", "Gym"],
+    description: "An executive 4-bedroom villa in the prestigious Milimani area. Features a swimming pool, gym, and beautifully landscaped garden.",
+    agent: {
+      name: "Sarah Wanjiku",
+      phone: "+254 712 345 678",
+      email: "sarah.wanjiku@nakuruhomes.com",
+      image: "https://images.unsplash.com/photo-1494790108755-2616b612b47c?w=150&h=150&fit=crop&crop=face",
+      experience: "5+ years",
+      rating: 4.8
+    },
+    office: {
+      name: "Nakuru HomesConnect - Head Office",
+      address: "Kenyatta Avenue, Nakuru Town",
+      phone: "+254 712 345 678",
+      email: "info@nakuruhomes.com",
+      hours: "Mon-Fri: 8AM-6PM, Sat: 9AM-3PM"
+    },
+    branches: [
+      { name: "Lanet Branch", address: "Lanet Shopping Center", phone: "+254 712 345 679", manager: "James Kimani" },
+      { name: "Njoro Branch", address: "Njoro Town Center", phone: "+254 712 345 680", manager: "Grace Muthoni" },
+      { name: "Rongai Branch", address: "Rongai Market Road", phone: "+254 712 345 681", manager: "Peter Kiprotich" }
+    ],
+    payment: {
+      paybill: "522533",
+      accountNumber: "HOUSE005",
+      businessName: "Nakuru HomesConnect Ltd"
+    },
+    available: true,
+    dateAvailable: "2024-08-01"
+  },
+  6: {
+    id: 6,
+    title: "1BR Garden Apartment",
+    type: "1BR",
+    location: "Section 58",
+    rent: 18000,
+    images: [
+      "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1484154218962-a197022b5858?w=800&h=600&fit=crop"
+    ],
+    features: ["Garden View", "Parking", "Security", "Water included", "WiFi"],
+    description: "A charming 1-bedroom apartment with garden views in Section 58. Quiet neighborhood with easy access to amenities.",
+    agent: {
+      name: "Mary Njeri",
+      phone: "+254 712 345 682",
+      email: "mary.njeri@nakuruhomes.com",
+      image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&h=150&fit=crop&crop=face",
+      experience: "2+ years",
+      rating: 4.4
+    },
+    office: {
+      name: "Nakuru HomesConnect - Head Office",
+      address: "Kenyatta Avenue, Nakuru Town",
+      phone: "+254 712 345 678",
+      email: "info@nakuruhomes.com",
+      hours: "Mon-Fri: 8AM-6PM, Sat: 9AM-3PM"
+    },
+    branches: [
+      { name: "Lanet Branch", address: "Lanet Shopping Center", phone: "+254 712 345 679", manager: "James Kimani" },
+      { name: "Njoro Branch", address: "Njoro Town Center", phone: "+254 712 345 680", manager: "Grace Muthoni" },
+      { name: "Rongai Branch", address: "Rongai Market Road", phone: "+254 712 345 681", manager: "Peter Kiprotich" }
+    ],
+    payment: {
+      paybill: "522533",
+      accountNumber: "HOUSE006",
+      businessName: "Nakuru HomesConnect Ltd"
+    },
+    available: true,
+    dateAvailable: "2024-07-10"
+  },
+  7: {
+    id: 7,
+    title: "Modern 3BR Penthouse",
+    type: "3BR",
+    location: "Nakuru East",
+    rent: 42000,
+    images: [
+      "https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=800&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&h=600&fit=crop"
+    ],
+    features: ["Rooftop Terrace", "Modern Kitchen", "Parking", "Security", "Generator", "WiFi"],
+    description: "A luxurious 3-bedroom penthouse with rooftop terrace in Nakuru East. Modern finishes and panoramic views of the city.",
+    agent: {
+      name: "David Mutua",
+      phone: "+254 712 345 683",
+      email: "david.mutua@nakuruhomes.com",
+      image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face",
+      experience: "7+ years",
+      rating: 4.7
+    },
+    office: {
+      name: "Nakuru HomesConnect - Head Office",
+      address: "Kenyatta Avenue, Nakuru Town",
+      phone: "+254 712 345 678",
+      email: "info@nakuruhomes.com",
+      hours: "Mon-Fri: 8AM-6PM, Sat: 9AM-3PM"
+    },
+    branches: [
+      { name: "Lanet Branch", address: "Lanet Shopping Center", phone: "+254 712 345 679", manager: "James Kimani" },
+      { name: "Njoro Branch", address: "Njoro Town Center", phone: "+254 712 345 680", manager: "Grace Muthoni" },
+      { name: "Rongai Branch", address: "Rongai Market Road", phone: "+254 712 345 681", manager: "Peter Kiprotich" }
+    ],
+    payment: {
+      paybill: "522533",
+      accountNumber: "HOUSE007",
+      businessName: "Nakuru HomesConnect Ltd"
+    },
+    available: true,
+    dateAvailable: "2024-08-15"
+  },
+  8: {
+    id: 8,
+    title: "Affordable Bedsitter",
+    type: "Bedsitter",
+    location: "Kaptembwo",
+    rent: 6500,
+    images: [
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop"
+    ],
+    features: ["Water included", "Security", "Parking"],
+    description: "An affordable bedsitter in Kaptembwo, perfect for budget-conscious tenants. Basic amenities included with secure compound.",
+    agent: {
+      name: "Anne Waweru",
+      phone: "+254 712 345 684",
+      email: "anne.waweru@nakuruhomes.com",
+      image: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=150&h=150&fit=crop&crop=face",
+      experience: "3+ years",
+      rating: 4.2
+    },
+    office: {
+      name: "Nakuru HomesConnect - Head Office",
+      address: "Kenyatta Avenue, Nakuru Town",
+      phone: "+254 712 345 678",
+      email: "info@nakuruhomes.com",
+      hours: "Mon-Fri: 8AM-6PM, Sat: 9AM-3PM"
+    },
+    branches: [
+      { name: "Lanet Branch", address: "Lanet Shopping Center", phone: "+254 712 345 679", manager: "James Kimani" },
+      { name: "Njoro Branch", address: "Njoro Town Center", phone: "+254 712 345 680", manager: "Grace Muthoni" },
+      { name: "Rongai Branch", address: "Rongai Market Road", phone: "+254 712 345 681", manager: "Peter Kiprotich" }
+    ],
+    payment: {
+      paybill: "522533",
+      accountNumber: "HOUSE008",
+      businessName: "Nakuru HomesConnect Ltd"
+    },
+    available: true,
+    dateAvailable: "2024-06-10"
+  },
+  9: {
+    id: 9,
+    title: "Family 2BR Duplex",
+    type: "2BR",
+    location: "Bahati",
+    rent: 22000,
+    images: [
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1600573472550-8090b5e0745e?w=800&h=600&fit=crop"
+    ],
+    features: ["Duplex Design", "Garden", "Parking", "Security", "Water included", "WiFi"],
+    description: "A family-friendly 2-bedroom duplex in Bahati. Two-level design with garden space, perfect for families with children.",
+    agent: {
+      name: "Joseph Kariuki",
+      phone: "+254 712 345 685",
+      email: "joseph.kariuki@nakuruhomes.com",
+      image: "https://images.unsplash.com/photo-1519244703995-f4e0f30006d5?w=150&h=150&fit=crop&crop=face",
+      experience: "4+ years",
+      rating: 4.6
+    },
+    office: {
+      name: "Nakuru HomesConnect - Head Office",
+      address: "Kenyatta Avenue, Nakuru Town",
+      phone: "+254 712 345 678",
+      email: "info@nakuruhomes.com",
+      hours: "Mon-Fri: 8AM-6PM, Sat: 9AM-3PM"
+    },
+    branches: [
+      { name: "Lanet Branch", address: "Lanet Shopping Center", phone: "+254 712 345 679", manager: "James Kimani" },
+      { name: "Njoro Branch", address: "Njoro Town Center", phone: "+254 712 345 680", manager: "Grace Muthoni" },
+      { name: "Rongai Branch", address: "Rongai Market Road", phone: "+254 712 345 681", manager: "Peter Kiprotich" }
+    ],
+    payment: {
+      paybill: "522533",
+      accountNumber: "HOUSE009",
+      businessName: "Nakuru HomesConnect Ltd"
+    },
+    available: true,
+    dateAvailable: "2024-07-20"
+  },
+  10: {
+    id: 10,
+    title: "Luxury 5BR Mansion",
+    type: "5BR",
+    location: "Upperhill",
+    rent: 85000,
+    images: [
+      "https://images.unsplash.com/photo-1600607687644-aac4c3eac7f4?w=800&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?w=800&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1600607688969-a5bfcd646154?w=800&h=600&fit=crop"
+    ],
+    features: ["Swimming Pool", "Garden", "Parking", "Security", "Generator", "WiFi", "Gym", "Sauna", "Study Room"],
+    description: "A luxury 5-bedroom mansion in the exclusive Upperhill area. Features swimming pool, gym, sauna, study room, and beautifully landscaped gardens.",
+    agent: {
+      name: "Sarah Wanjiku",
+      phone: "+254 712 345 678",
+      email: "sarah.wanjiku@nakuruhomes.com",
+      image: "https://images.unsplash.com/photo-1494790108755-2616b612b47c?w=150&h=150&fit=crop&crop=face",
+      experience: "5+ years",
+      rating: 4.8
+    },
+    office: {
+      name: "Nakuru HomesConnect - Head Office",
+      address: "Kenyatta Avenue, Nakuru Town",
+      phone: "+254 712 345 678",
+      email: "info@nakuruhomes.com",
+      hours: "Mon-Fri: 8AM-6PM, Sat: 9AM-3PM"
+    },
+    branches: [
+      { name: "Lanet Branch", address: "Lanet Shopping Center", phone: "+254 712 345 679", manager: "James Kimani" },
+      { name: "Njoro Branch", address: "Njoro Town Center", phone: "+254 712 345 680", manager: "Grace Muthoni" },
+      { name: "Rongai Branch", address: "Rongai Market Road", phone: "+254 712 345 681", manager: "Peter Kiprotich" }
+    ],
+    payment: {
+      paybill: "522533",
+      accountNumber: "HOUSE010",
+      businessName: "Nakuru HomesConnect Ltd"
+    },
+    available: true,
+    dateAvailable: "2024-09-01"
   }
 };
 

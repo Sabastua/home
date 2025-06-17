@@ -8,7 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Search, Filter, Download, DollarSign, Calendar, User, MapPin } from 'lucide-react';
 
-// Mock payment data
+// Enhanced mock payment data for all 10 properties
 const mockPayments = [
   {
     id: 1,
@@ -48,15 +48,135 @@ const mockPayments = [
   },
   {
     id: 4,
-    plotNumber: 'P002',
+    plotNumber: 'P004',
     tenantName: 'Peter Mwangi',
-    propertyTitle: 'Cozy Bedsitter',
+    propertyTitle: 'Studio Apartment',
     amount: 12000,
     type: 'rent',
     status: 'pending',
     dueDate: '2024-07-05',
     paidDate: null,
     mpesaCode: null
+  },
+  {
+    id: 5,
+    plotNumber: 'P005',
+    tenantName: 'Dr. James Mwangi',
+    propertyTitle: 'Executive 4BR Villa',
+    amount: 55000,
+    type: 'rent',
+    status: 'paid',
+    dueDate: '2024-06-30',
+    paidDate: '2024-06-20',
+    mpesaCode: 'QCR7TXN789'
+  },
+  {
+    id: 6,
+    plotNumber: 'P005',
+    tenantName: 'Dr. James Mwangi',
+    propertyTitle: 'Executive 4BR Villa',
+    amount: 5000,
+    type: 'water',
+    status: 'paid',
+    dueDate: '2024-06-30',
+    paidDate: '2024-06-22',
+    mpesaCode: 'QDR8TXN012'
+  },
+  {
+    id: 7,
+    plotNumber: 'P007',
+    tenantName: 'Sarah Njoki',
+    propertyTitle: 'Modern 3BR Penthouse',
+    amount: 42000,
+    type: 'rent',
+    status: 'paid',
+    dueDate: '2024-06-30',
+    paidDate: '2024-06-12',
+    mpesaCode: 'QER9TXN345'
+  },
+  {
+    id: 8,
+    plotNumber: 'P008',
+    tenantName: 'Grace Wangui',
+    propertyTitle: 'Affordable Bedsitter',
+    amount: 6500,
+    type: 'rent',
+    status: 'paid',
+    dueDate: '2024-06-30',
+    paidDate: '2024-06-08',
+    mpesaCode: 'QFS0TXN678'
+  },
+  {
+    id: 9,
+    plotNumber: 'P010',
+    tenantName: 'Mr. & Mrs. Kariuki',
+    propertyTitle: 'Luxury 5BR Mansion',
+    amount: 85000,
+    type: 'rent',
+    status: 'paid',
+    dueDate: '2024-06-30',
+    paidDate: '2024-06-25',
+    mpesaCode: 'QGT1TXN901'
+  },
+  {
+    id: 10,
+    plotNumber: 'P010',
+    tenantName: 'Mr. & Mrs. Kariuki',
+    propertyTitle: 'Luxury 5BR Mansion',
+    amount: 8000,
+    type: 'water',
+    status: 'paid',
+    dueDate: '2024-06-30',
+    paidDate: '2024-06-26',
+    mpesaCode: 'QHU2TXN234'
+  },
+  {
+    id: 11,
+    plotNumber: 'P003',
+    tenantName: 'Mary Wanjiku',
+    propertyTitle: 'Spacious 3BR House',
+    amount: 3000,
+    type: 'water',
+    status: 'overdue',
+    dueDate: '2024-06-30',
+    paidDate: null,
+    mpesaCode: null
+  },
+  {
+    id: 12,
+    plotNumber: 'P004',
+    tenantName: 'Peter Mwangi',
+    propertyTitle: 'Studio Apartment',
+    amount: 1500,
+    type: 'water',
+    status: 'pending',
+    dueDate: '2024-07-05',
+    paidDate: null,
+    mpesaCode: null
+  },
+  {
+    id: 13,
+    plotNumber: 'P007',
+    tenantName: 'Sarah Njoki',
+    propertyTitle: 'Modern 3BR Penthouse',
+    amount: 4000,
+    type: 'water',
+    status: 'paid',
+    dueDate: '2024-06-30',
+    paidDate: '2024-06-15',
+    mpesaCode: 'QIV3TXN567'
+  },
+  {
+    id: 14,
+    plotNumber: 'P008',
+    tenantName: 'Grace Wangui',
+    propertyTitle: 'Affordable Bedsitter',
+    amount: 800,
+    type: 'water',
+    status: 'paid',
+    dueDate: '2024-06-30',
+    paidDate: '2024-06-10',
+    mpesaCode: 'QJW4TXN890'
   }
 ];
 
@@ -93,6 +213,7 @@ const PaymentManagement = () => {
   const totalRevenue = payments.filter(p => p.status === 'paid').reduce((sum, p) => sum + p.amount, 0);
   const pendingAmount = payments.filter(p => p.status === 'pending').reduce((sum, p) => sum + p.amount, 0);
   const overdueAmount = payments.filter(p => p.status === 'overdue').reduce((sum, p) => sum + p.amount, 0);
+  const totalPayments = payments.length;
 
   return (
     <div className="space-y-6">
@@ -149,9 +270,9 @@ const PaymentManagement = () => {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Total Tenants</p>
+                <p className="text-sm font-medium text-gray-600">Total Payments</p>
                 <p className="text-2xl font-bold text-blue-600">
-                  {new Set(payments.map(p => p.tenantName)).size}
+                  {totalPayments}
                 </p>
               </div>
               <User className="w-8 h-8 text-blue-600" />
