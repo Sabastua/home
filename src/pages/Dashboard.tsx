@@ -1,13 +1,13 @@
-
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Calendar, TrendingUp, DollarSign, Home, Receipt, Download, Eye, Users, Building } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Calendar, TrendingUp, DollarSign, Home, Receipt, Download, Eye, Users, Building, LogOut } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, ResponsiveContainer } from 'recharts';
+import AdminAuth from '@/components/AdminAuth';
 
 // Mock data for admin analytics
 const monthlyRevenue = [
@@ -50,6 +50,30 @@ const adminData = {
 };
 
 const Dashboard = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const adminAuth = localStorage.getItem('adminAuthenticated');
+    if (adminAuth === 'true') {
+      setIsAuthenticated(true);
+    }
+  }, []);
+
+  const handleLogin = () => {
+    setIsAuthenticated(true);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('adminAuthenticated');
+    setIsAuthenticated(false);
+    navigate('/');
+  };
+
+  if (!isAuthenticated) {
+    return <AdminAuth onLogin={handleLogin} />;
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -60,15 +84,19 @@ const Dashboard = () => {
               <div className="w-8 h-8 bg-gradient-to-r from-green-600 to-red-600 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-sm">NH</span>
               </div>
-              <h1 className="text-xl font-bold text-gray-900">Admin Dashboard</h1>
+              <h1 className="text-xl font-bold text-gray-900">Financial Dashboard</h1>
             </Link>
             <div className="flex items-center space-x-4">
               <Link to="/admin">
-                <Button variant="outline">Manage Listings</Button>
+                <Button variant="outline">Manage Properties</Button>
               </Link>
               <Link to="/">
                 <Button variant="outline">Back to Home</Button>
               </Link>
+              <Button variant="outline" onClick={handleLogout}>
+                <LogOut className="w-4 h-4 mr-2" />
+                Logout
+              </Button>
             </div>
           </div>
         </div>
