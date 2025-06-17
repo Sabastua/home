@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import PropertySwipeCard from '@/components/PropertySwipeCard';
 import PropertyFilters from '@/components/PropertyFilters';
+import MobileSwipeView from '@/components/MobileSwipeView';
 import OnboardingModal from '@/components/OnboardingModal';
 import PaymentModal from '@/components/PaymentModal';
 
@@ -291,6 +292,13 @@ const Index = () => {
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [currentSwipeIndex, setCurrentSwipeIndex] = useState(0);
+  const [showFilters, setShowFilters] = useState(false);
+  const [filters, setFilters] = useState({
+    type: 'All',
+    location: 'All',
+    maxRent: 100000,
+    minRent: 5000
+  });
   const [paymentModal, setPaymentModal] = useState({
     isOpen: false,
     propertyId: null as number | null,
@@ -306,6 +314,12 @@ const Index = () => {
       localStorage.setItem('hasVisited', 'true');
     }
 
+    // Load favorites from localStorage
+    const savedFavorites = localStorage.getItem('favorites');
+    if (savedFavorites) {
+      setFavorites(JSON.parse(savedFavorites));
+    }
+
     // Detect mobile devices
     const mobileQuery = window.matchMedia('(max-width: 768px)');
     setIsMobile(mobileQuery.matches);
@@ -317,12 +331,36 @@ const Index = () => {
     };
   }, []);
 
-  const toggleFavorite = (propertyId: number) => {
-    setFavorites((prevFavorites) =>
-      prevFavorites.includes(propertyId)
-        ? prevFavorites.filter((id) => id !== propertyId)
-        : [...prevFavorites, propertyId]
+  useEffect(() => {
+    // Apply filters
+    let filtered = properties;
+
+    if (filters.type !== 'All') {
+      filtered = filtered.filter(property => property.type === filters.type);
+    }
+
+    if (filters.location !== 'All') {
+      filtered = filtered.filter(property => property.location === filters.location);
+    }
+
+    filtered = filtered.filter(property => 
+      property.rent >= filters.minRent && property.rent <= filters.maxRent
     );
+
+    setFilteredProperties(filtered);
+    setCurrentSwipeIndex(0); // Reset swipe index when filters change
+  }, [filters, properties]);
+
+  const toggleFavorite = (propertyId: number) => {
+    setFavorites((prevFavorites) => {
+      const newFavorites = prevFavorites.includes(propertyId)
+        ? prevFavorites.filter((id) => id !== propertyId)
+        : [...prevFavorites, propertyId];
+      
+      // Save to localStorage
+      localStorage.setItem('favorites', JSON.stringify(newFavorites));
+      return newFavorites;
+    });
   };
 
   const handleSwipe = (direction: 'left' | 'right', propertyId: number) => {
@@ -376,8 +414,13 @@ const Index = () => {
               <span className="font-medium">Nakuru HomesConnect</span>
             </Link>
             <div className="flex items-center space-x-4">
-              <Link to="/favorites" className="text-gray-600 hover:text-red-500 transition-colors">
+              <Link to="/favorites" className="text-gray-600 hover:text-red-500 transition-colors relative">
                 <Heart className="w-5 h-5" />
+                {favorites.length > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                    {favorites.length}
+                  </span>
+                )}
               </Link>
               <Link to="/profile" className="text-gray-600 hover:text-gray-900 transition-colors">
                 <User className="w-5 h-5" />
@@ -410,11 +453,32 @@ const Index = () => {
           </div>
         </div>
 
-        {/* Filters */}
-        <PropertyFilters onFilterChange={setFilteredProperties} />
+        {/* Filter Button for Mobile */}
+        {isMobile && (
+          <div className="mb-6">
+            <Button 
+              onClick={() => setShowFilters(true)}
+              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-2xl"
+            >
+              Filter Properties
+            </Button>
+          </div>
+        )}
+
+        {/* Filters for Desktop */}
+        {!isMobile && (
+          <div className="mb-8">
+            <PropertyFilters
+              isOpen={true}
+              onClose={() => {}}
+              filters={filters}
+              onFiltersChange={setFilters}
+            />
+          </div>
+        )}
 
         {/* Properties Grid - Desktop */}
-        <div className="hidden lg:block">
+        {!isMobile && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredProperties.map((property) => (
               <Card key={property.id} className="overflow-hidden rounded-3xl border-0 shadow-sm hover:shadow-xl transition-all duration-300 group">
@@ -434,7 +498,7 @@ const Index = () => {
                             : 'bg-white/90 text-gray-600 hover:text-red-500'
                         }`}
                       >
-                        <Heart className="w-4 h-4" />
+                        <Heart className="w-4 h-4" fill={favorites.includes(property.id) ? 'currentColor' : 'none'} />
                       </button>
                     </div>
                     <div className="absolute bottom-4 left-4">
@@ -517,25 +581,16 @@ const Index = () => {
               </Card>
             ))}
           </div>
-        </div>
+        )}
 
         {/* Mobile Swipe View */}
-        <div className="lg:hidden">
-          {filteredProperties.length > 0 && currentSwipeIndex < filteredProperties.length && (
-            <div className="relative">
-              {/* Stack of cards for swipe effect */}
-              {filteredProperties.slice(currentSwipeIndex, currentSwipeIndex + 3).map((property, index) => (
-                <PropertySwipeCard 
-                  key={property.id}
-                  property={property}
-                  index={index}
-                  onSwipe={handleSwipe}
-                  isActive={index === 0}
-                />
-              ))}
-            </div>
-          )}
-        </div>
+        {isMobile && (
+          <MobileSwipeView
+            properties={filteredProperties}
+            currentIndex={currentSwipeIndex}
+            onSwipe={handleSwipe}
+          />
+        )}
 
         {/* Empty State */}
         {filteredProperties.length === 0 && (
@@ -550,7 +605,7 @@ const Index = () => {
         )}
 
         {/* Pagination (Example - replace with actual pagination logic) */}
-        {filteredProperties.length > 0 && (
+        {filteredProperties.length > 0 && !isMobile && (
           <div className="flex justify-center mt-8">
             <Button variant="outline" className="mr-2 rounded-2xl">
               Previous
@@ -574,6 +629,16 @@ const Index = () => {
         paymentType={paymentModal.paymentType}
         amount={paymentModal.amount}
       />
+
+      {/* Mobile Filters Modal */}
+      {isMobile && (
+        <PropertyFilters
+          isOpen={showFilters}
+          onClose={() => setShowFilters(false)}
+          filters={filters}
+          onFiltersChange={setFilters}
+        />
+      )}
     </div>
   );
 };
