@@ -1,32 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Filter, MapPin, Plus, User, Heart, X, Star, Info, Sparkles } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { MapPin, Heart, Eye, DollarSign, Building2, User, Phone, MessageCircle } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Link } from 'react-router-dom';
-import OnboardingModal from '@/components/OnboardingModal';
 import PropertySwipeCard from '@/components/PropertySwipeCard';
 import PropertyFilters from '@/components/PropertyFilters';
+import OnboardingModal from '@/components/OnboardingModal';
+import PaymentModal from '@/components/PaymentModal';
 
-// Enhanced mock data for 10 properties
-const properties = [
+// Mock property data (replace with your actual data source)
+const propertyData = [
   {
     id: 1,
     title: "Modern 2BR Apartment",
     type: "2BR",
     location: "Nakuru Town",
     rent: 25000,
-    image: "https://images.unsplash.com/photo-1721322800607-8c38375eef04?w=400&h=600&fit=crop",
-    images: [
-      "https://images.unsplash.com/photo-1721322800607-8c38375eef04?w=400&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=400&h=600&fit=crop"
-    ],
-    features: ["Water included", "Parking", "Security", "WiFi", "Generator"],
-    available: true,
-    rating: 4.8,
-    reviews: 24
+    image: "https://images.unsplash.com/photo-1721322800607-8c38375eef04?w=800&h=600&fit=crop",
+    features: ["Water included", "Parking", "Security"]
   },
   {
     id: 2,
@@ -34,15 +26,8 @@ const properties = [
     type: "Bedsitter",
     location: "Lanet",
     rent: 8000,
-    image: "https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=400&h=600&fit=crop",
-    images: [
-      "https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=400&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=600&fit=crop"
-    ],
-    features: ["Furnished", "Water included", "WiFi", "Security"],
-    available: true,
-    rating: 4.2,
-    reviews: 18
+    image: "https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=800&h=600&fit=crop",
+    features: ["Furnished", "Water included", "WiFi"]
   },
   {
     id: 3,
@@ -50,15 +35,8 @@ const properties = [
     type: "3BR",
     location: "Njoro",
     rent: 35000,
-    image: "https://images.unsplash.com/photo-1487958449943-2429e8be8625?w=400&h=600&fit=crop",
-    images: [
-      "https://images.unsplash.com/photo-1487958449943-2429e8be8625?w=400&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400&h=600&fit=crop"
-    ],
-    features: ["Own Compound", "Garden", "Parking", "Security", "Generator"],
-    available: true,
-    rating: 4.9,
-    reviews: 31
+    image: "https://images.unsplash.com/photo-1487958449943-2429e8be8625?w=800&h=600&fit=crop",
+    features: ["Own Compound", "Garden", "Parking"]
   },
   {
     id: 4,
@@ -66,14 +44,8 @@ const properties = [
     type: "Studio",
     location: "Rongai",
     rent: 12000,
-    image: "https://images.unsplash.com/photo-1518005020951-eccb494ad742?w=400&h=600&fit=crop",
-    images: [
-      "https://images.unsplash.com/photo-1518005020951-eccb494ad742?w=400&h=600&fit=crop"
-    ],
-    features: ["Modern", "Security", "Water included", "WiFi"],
-    available: true,
-    rating: 4.5,
-    reviews: 12
+    image: "https://images.unsplash.com/photo-1518005020951-eccb494ad742?w=800&h=600&fit=crop",
+    features: ["Modern", "Security", "Water included"]
   },
   {
     id: 5,
@@ -81,16 +53,8 @@ const properties = [
     type: "4BR",
     location: "Milimani",
     rent: 55000,
-    image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=400&h=600&fit=crop",
-    images: [
-      "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=400&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=400&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=400&h=600&fit=crop"
-    ],
-    features: ["Swimming Pool", "Garden", "Parking", "Security", "Generator", "WiFi", "Gym"],
-    available: true,
-    rating: 4.9,
-    reviews: 45
+    image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&h=600&fit=crop",
+    features: ["Swimming Pool", "Garden", "Parking", "Security", "Generator", "WiFi", "Gym"]
   },
   {
     id: 6,
@@ -98,15 +62,8 @@ const properties = [
     type: "1BR",
     location: "Section 58",
     rent: 18000,
-    image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=400&h=600&fit=crop",
-    images: [
-      "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=400&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1484154218962-a197022b5858?w=400&h=600&fit=crop"
-    ],
-    features: ["Garden View", "Parking", "Security", "Water included", "WiFi"],
-    available: true,
-    rating: 4.3,
-    reviews: 16
+    image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&h=600&fit=crop",
+    features: ["Garden View", "Parking", "Security", "Water included", "WiFi"]
   },
   {
     id: 7,
@@ -114,15 +71,8 @@ const properties = [
     type: "3BR",
     location: "Nakuru East",
     rent: 42000,
-    image: "https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=400&h=600&fit=crop",
-    images: [
-      "https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=400&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=400&h=600&fit=crop"
-    ],
-    features: ["Rooftop Terrace", "Modern Kitchen", "Parking", "Security", "Generator", "WiFi"],
-    available: true,
-    rating: 4.7,
-    reviews: 28
+    image: "https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=800&h=600&fit=crop",
+    features: ["Rooftop Terrace", "Modern Kitchen", "Parking", "Security", "Generator", "WiFi"]
   },
   {
     id: 8,
@@ -130,14 +80,8 @@ const properties = [
     type: "Bedsitter",
     location: "Kaptembwo",
     rent: 6500,
-    image: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&h=600&fit=crop",
-    images: [
-      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&h=600&fit=crop"
-    ],
-    features: ["Water included", "Security", "Parking"],
-    available: true,
-    rating: 4.0,
-    reviews: 9
+    image: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop",
+    features: ["Water included", "Security", "Parking"]
   },
   {
     id: 9,
@@ -145,15 +89,8 @@ const properties = [
     type: "2BR",
     location: "Bahati",
     rent: 22000,
-    image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400&h=600&fit=crop",
-    images: [
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1600573472550-8090b5e0745e?w=400&h=600&fit=crop"
-    ],
-    features: ["Duplex Design", "Garden", "Parking", "Security", "Water included", "WiFi"],
-    available: true,
-    rating: 4.6,
-    reviews: 22
+    image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&h=600&fit=crop",
+    features: ["Duplex Design", "Garden", "Parking", "Security", "Water included", "WiFi"]
   },
   {
     id: 10,
@@ -161,407 +98,308 @@ const properties = [
     type: "5BR",
     location: "Upperhill",
     rent: 85000,
-    image: "https://images.unsplash.com/photo-1600607687644-aac4c3eac7f4?w=400&h=600&fit=crop",
-    images: [
-      "https://images.unsplash.com/photo-1600607687644-aac4c3eac7f4?w=400&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?w=400&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1600607688969-a5bfcd646154?w=400&h=600&fit=crop"
-    ],
-    features: ["Swimming Pool", "Garden", "Parking", "Security", "Generator", "WiFi", "Gym", "Sauna", "Study Room"],
-    available: true,
-    rating: 5.0,
-    reviews: 67
+    image: "https://images.unsplash.com/photo-1600607687644-aac4c3eac7f4?w=800&h=600&fit=crop",
+    features: ["Swimming Pool", "Garden", "Parking", "Security", "Generator", "WiFi", "Gym", "Sauna", "Study Room"]
   }
 ];
 
 const Index = () => {
+  const [properties, setProperties] = useState(propertyData);
+  const [filteredProperties, setFilteredProperties] = useState(propertyData);
+  const [favorites, setFavorites] = useState<number[]>([]);
   const [showOnboarding, setShowOnboarding] = useState(false);
-  const [showFilters, setShowFilters] = useState(false);
-  const [currentPropertyIndex, setCurrentPropertyIndex] = useState(0);
-  const [likedProperties, setLikedProperties] = useState<number[]>([]);
-  const [isFirstTime, setIsFirstTime] = useState(true);
-  const [isDesktop, setIsDesktop] = useState(false);
-  const [filters, setFilters] = useState({
-    type: "All",
-    location: "All",
-    maxRent: 90000,
-    minRent: 0
+  const [isMobile, setIsMobile] = useState(false);
+  const [paymentModal, setPaymentModal] = useState({
+    isOpen: false,
+    propertyId: null as number | null,
+    paymentType: 'rent' as 'rent' | 'water' | 'deposit',
+    amount: 0
   });
 
-  // Check if device is desktop
   useEffect(() => {
-    const checkIsDesktop = () => {
-      setIsDesktop(window.innerWidth >= 1024);
+    // Check if it's the user's first time visiting the site
+    const hasVisited = localStorage.getItem('hasVisited');
+    if (!hasVisited) {
+      setShowOnboarding(true);
+      localStorage.setItem('hasVisited', 'true');
+    }
+
+    // Detect mobile devices
+    const mobileQuery = window.matchMedia('(max-width: 768px)');
+    setIsMobile(mobileQuery.matches);
+    const listener = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    mobileQuery.addEventListener('change', listener);
+
+    return () => {
+      mobileQuery.removeEventListener('change', listener);
     };
-    
-    checkIsDesktop();
-    window.addEventListener('resize', checkIsDesktop);
-    
-    return () => window.removeEventListener('resize', checkIsDesktop);
   }, []);
 
-  const filteredProperties = properties.filter(property => {
-    const matchesType = filters.type === "All" || property.type === filters.type;
-    const matchesLocation = filters.location === "All" || property.location === filters.location;
-    const matchesRent = property.rent >= filters.minRent && property.rent <= filters.maxRent;
-    return matchesType && matchesLocation && matchesRent;
-  });
-
-  const handleSwipe = (direction: 'left' | 'right', propertyId: number) => {
-    if (direction === 'right') {
-      setLikedProperties(prev => [...prev, propertyId]);
-    }
-    
-    if (!isDesktop) {
-      setTimeout(() => {
-        setCurrentPropertyIndex(prev => prev + 1);
-        setIsFirstTime(false);
-      }, 300);
-    }
-  };
-
-  const resetStack = () => {
-    setCurrentPropertyIndex(0);
-    setIsFirstTime(true);
-  };
-
-  const currentProperty = filteredProperties[currentPropertyIndex];
-  const hasMoreProperties = currentPropertyIndex < filteredProperties.length;
-
-  // Desktop Grid Layout
-  if (isDesktop) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50">
-        {/* Animated Background Elements */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-pink-400/20 to-purple-400/20 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-blue-400/20 to-cyan-400/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
-        </div>
-
-        {/* Desktop Header */}
-        <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-xl border-b border-white/20 shadow-lg">
-          <div className="max-w-7xl mx-auto px-6 py-4">
-            <div className="flex justify-between items-center">
-              <div className="flex items-center space-x-4">
-                <div className="relative">
-                  <div className="w-12 h-12 bg-gradient-to-br from-pink-500 via-purple-500 to-blue-500 rounded-2xl flex items-center justify-center shadow-xl">
-                    <span className="text-white font-bold text-lg">NH</span>
-                  </div>
-                  <div className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-r from-green-400 to-emerald-400 rounded-full animate-pulse"></div>
-                </div>
-                <div>
-                  <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
-                    Nakuru Homes
-                  </h1>
-                  <p className="text-sm text-gray-500 flex items-center">
-                    <Sparkles className="w-4 h-4 mr-1 text-yellow-500" />
-                    Discover your perfect home
-                  </p>
-                </div>
-              </div>
-              
-              {/* Desktop Search and Filters */}
-              <div className="flex-1 max-w-md mx-8">
-                <div className="relative">
-                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <Input 
-                    placeholder="Search properties..." 
-                    className="pl-12 pr-4 py-3 rounded-2xl border-gray-200 bg-white/90 backdrop-blur-sm"
-                  />
-                </div>
-              </div>
-
-              <div className="flex items-center space-x-3">
-                <Button 
-                  variant="ghost" 
-                  onClick={() => setShowFilters(true)}
-                  className="px-6 py-3 rounded-2xl bg-gradient-to-br from-gray-100 to-gray-200 hover:from-gray-200 hover:to-gray-300 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
-                >
-                  <Filter className="w-5 h-5 mr-2 text-gray-700" />
-                  Filters
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  onClick={() => setShowOnboarding(true)}
-                  className="px-6 py-3 rounded-2xl bg-gradient-to-br from-blue-100 to-purple-100 hover:from-blue-200 hover:to-purple-200 text-blue-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
-                >
-                  <User className="w-5 h-5 mr-2" />
-                  Profile
-                </Button>
-              </div>
-            </div>
-          </div>
-        </header>
-
-        {/* Desktop Property Grid */}
-        <main className="max-w-7xl mx-auto px-6 py-8">
-          {filteredProperties.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {filteredProperties.map((property, index) => (
-                <div 
-                  key={property.id} 
-                  className="h-96 animate-fade-in"
-                  style={{ animationDelay: `${index * 100}ms` }}
-                >
-                  <PropertySwipeCard
-                    property={property}
-                    index={index}
-                    onSwipe={handleSwipe}
-                    isActive={true}
-                    isDesktop={true}
-                  />
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-16">
-              <div className="relative mb-8">
-                <div className="w-24 h-24 bg-gradient-to-br from-pink-500 via-purple-500 to-blue-500 rounded-full flex items-center justify-center mx-auto shadow-2xl">
-                  <Heart className="w-12 h-12 text-white animate-pulse" />
-                </div>
-                <div className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full flex items-center justify-center animate-bounce">
-                  <Sparkles className="w-4 h-4 text-white" />
-                </div>
-              </div>
-              <h3 className="text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-4">
-                No properties found
-              </h3>
-              <p className="text-gray-600 mb-8 text-lg">
-                Try adjusting your filters to see more properties
-              </p>
-              <Button 
-                onClick={() => setShowFilters(true)}
-                className="bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 hover:from-pink-600 hover:via-purple-600 hover:to-blue-600 text-white rounded-2xl px-8 py-4 text-base font-semibold shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105"
-              >
-                <Filter className="w-5 h-5 mr-2" />
-                Adjust Filters
-              </Button>
-            </div>
-          )}
-        </main>
-
-        {/* Liked Properties Counter for Desktop */}
-        {likedProperties.length > 0 && (
-          <div className="fixed top-6 right-6 z-50">
-            <Link to="/favorites">
-              <div className="bg-gradient-to-r from-pink-500 to-red-500 text-white rounded-2xl px-6 py-3 shadow-xl flex items-center space-x-3 hover:shadow-2xl transition-all duration-300 hover:scale-105">
-                <Heart className="w-5 h-5 animate-pulse" />
-                <span className="font-bold">{likedProperties.length} Liked</span>
-                <Sparkles className="w-5 h-5" />
-              </div>
-            </Link>
-          </div>
-        )}
-      </div>
+  const toggleFavorite = (propertyId: number) => {
+    setFavorites((prevFavorites) =>
+      prevFavorites.includes(propertyId)
+        ? prevFavorites.filter((id) => id !== propertyId)
+        : [...prevFavorites, propertyId]
     );
-  }
+  };
 
-  // Mobile Layout (existing code)
+  const filterProperties = (filters: any) => {
+    setFilteredProperties(() => {
+      let filtered = [...properties];
+
+      if (filters.location) {
+        filtered = filtered.filter(property =>
+          property.location.toLowerCase().includes(filters.location.toLowerCase())
+        );
+      }
+
+      if (filters.type) {
+        filtered = filtered.filter(property =>
+          property.type.toLowerCase() === filters.type.toLowerCase()
+        );
+      }
+
+      if (filters.minRent) {
+        filtered = filtered.filter(property => property.rent >= filters.minRent);
+      }
+
+      if (filters.maxRent) {
+        filtered = filtered.filter(property => property.rent <= filters.maxRent);
+      }
+
+      return filtered;
+    });
+  };
+
+  const handlePayment = (propertyId: number, type: 'rent' | 'water' | 'deposit') => {
+    const property = properties.find(p => p.id === propertyId);
+    if (!property) return;
+    
+    let amount = property.rent;
+    if (type === 'water') amount = Math.floor(property.rent * 0.1); // 10% of rent
+    if (type === 'deposit') amount = property.rent * 2; // 2 months deposit
+    
+    setPaymentModal({
+      isOpen: true,
+      propertyId,
+      paymentType: type,
+      amount
+    });
+  };
+
+  const closePaymentModal = () => {
+    setPaymentModal({
+      isOpen: false,
+      propertyId: null,
+      paymentType: 'rent',
+      amount: 0
+    });
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 relative overflow-hidden">
-      {/* Animated Background Elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-pink-400/20 to-purple-400/20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-blue-400/20 to-cyan-400/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
-      </div>
-
-      {/* Enhanced Mobile Header - Fixed at top */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-xl border-b border-white/20 shadow-lg">
-        <div className="px-4 py-4">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center space-x-3">
-              <div className="relative">
-                <div className="w-10 h-10 bg-gradient-to-br from-pink-500 via-purple-500 to-blue-500 rounded-2xl flex items-center justify-center shadow-xl">
-                  <span className="text-white font-bold text-sm">NH</span>
-                </div>
-                <div className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-r from-green-400 to-emerald-400 rounded-full animate-pulse"></div>
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <header className="bg-white/95 backdrop-blur-xl border-b border-gray-200/50 sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <Link to="/" className="flex items-center space-x-3 text-gray-700 hover:text-gray-900 transition-colors">
+              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
+                <span className="text-white font-bold text-sm">NH</span>
               </div>
-              <div>
-                <h1 className="text-lg font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
-                  Nakuru Homes
-                </h1>
-                <p className="text-xs text-gray-500 flex items-center">
-                  <Sparkles className="w-3 h-3 mr-1 text-yellow-500" />
-                  Find your perfect match
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center space-x-3">
-              <Button 
-                variant="ghost" 
-                size="sm"
-                onClick={() => setShowFilters(true)}
-                className="w-11 h-11 p-0 rounded-2xl bg-gradient-to-br from-gray-100 to-gray-200 hover:from-gray-200 hover:to-gray-300 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
-              >
-                <Filter className="w-5 h-5 text-gray-700" />
-              </Button>
-              <Button 
-                variant="ghost" 
-                size="sm"
-                onClick={() => setShowOnboarding(true)}
-                className="w-11 h-11 p-0 rounded-2xl bg-gradient-to-br from-blue-100 to-purple-100 hover:from-blue-200 hover:to-purple-200 text-blue-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
-              >
+              <span className="font-medium">Nakuru HomesConnect</span>
+            </Link>
+            <div className="flex items-center space-x-4">
+              <Link to="/favorites" className="text-gray-600 hover:text-red-500 transition-colors">
+                <Heart className="w-5 h-5" />
+              </Link>
+              <Link to="/profile" className="text-gray-600 hover:text-gray-900 transition-colors">
                 <User className="w-5 h-5" />
-              </Button>
+              </Link>
             </div>
           </div>
         </div>
       </header>
 
-      {/* Welcome Message for First Time Users */}
-      {isFirstTime && hasMoreProperties && (
-        <div className="fixed top-24 left-4 right-4 z-50 animate-slide-in-right">
-          <Card className="bg-gradient-to-r from-purple-500 to-pink-500 border-0 shadow-2xl">
-            <CardContent className="p-4 text-center">
-              <div className="flex justify-center mb-2">
-                <Heart className="w-6 h-6 text-white animate-pulse" />
-              </div>
-              <h3 className="text-white font-bold text-sm mb-1">Welcome to Nakuru Homes!</h3>
-              <p className="text-white/90 text-xs leading-relaxed">
-                Swipe right to like ❤️ or left to pass ✖️. Tap info for details!
-              </p>
-            </CardContent>
-          </Card>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        {/* Hero Section */}
+        <div className="text-center mb-8">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
+            Find Your Perfect Home in Nakuru
+          </h1>
+          <p className="text-lg text-gray-600 mb-6">
+            Discover a wide range of properties for rent in Nakuru County.
+          </p>
+          <div className="space-x-3">
+            <Link to="/properties" className="inline-block">
+              <Button size="lg" className="rounded-2xl">
+                View All Properties
+              </Button>
+            </Link>
+            <Link to="/contact" className="inline-block">
+              <Button variant="outline" size="lg" className="rounded-2xl">
+                Contact Us
+              </Button>
+            </Link>
+          </div>
         </div>
-      )}
 
-      {/* Main Content - Property Cards with Padding */}
-      {hasMoreProperties ? (
-        <div className="h-screen w-full pt-20 pb-4">
-          {/* Property Stack with Padded Cards */}
-          <div className="relative h-full w-full">
-            {filteredProperties.slice(currentPropertyIndex, currentPropertyIndex + 3).map((property, index) => (
-              <div
-                key={property.id}
-                className={`absolute transition-all duration-500 ease-out ${
-                  index === 0 ? 'z-30 scale-100 inset-0' : 
-                  index === 1 ? 'z-20 scale-95 inset-2' : 
-                  'z-10 scale-90 inset-4'
-                }`}
-                style={{
-                  transform: `scale(${1 - index * 0.02}) translateX(${index * 4}px)`,
-                  opacity: 1 - index * 0.1
-                }}
-              >
-                <PropertySwipeCard
-                  property={property}
-                  index={index}
-                  onSwipe={handleSwipe}
-                  isActive={index === 0}
-                  isDesktop={false}
-                />
-              </div>
+        {/* Filters */}
+        <PropertyFilters 
+          properties={properties}
+          onFilterChange={setFilteredProperties}
+        />
+
+        {/* Properties Grid - Desktop */}
+        <div className="hidden lg:block">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredProperties.map((property) => (
+              <Card key={property.id} className="overflow-hidden rounded-3xl border-0 shadow-sm hover:shadow-xl transition-all duration-300 group">
+                <CardContent className="p-0">
+                  <div className="relative">
+                    <img 
+                      src={property.image} 
+                      alt={property.title}
+                      className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                    <div className="absolute top-4 right-4">
+                      <button
+                        onClick={() => toggleFavorite(property.id)}
+                        className={`p-2 rounded-full shadow-lg transition-colors ${
+                          favorites.includes(property.id) 
+                            ? 'bg-red-500 text-white' 
+                            : 'bg-white/90 text-gray-600 hover:text-red-500'
+                        }`}
+                      >
+                        <Heart className="w-4 h-4" />
+                      </button>
+                    </div>
+                    <div className="absolute bottom-4 left-4">
+                      <Badge className="bg-green-500/90 text-white rounded-full shadow-lg backdrop-blur-sm">
+                        Available
+                      </Badge>
+                    </div>
+                  </div>
+                  
+                  <div className="p-6">
+                    <div className="flex justify-between items-start mb-3">
+                      <div>
+                        <h3 className="text-xl font-bold text-gray-900 mb-1">{property.title}</h3>
+                        <div className="flex items-center text-gray-600">
+                          <MapPin className="w-4 h-4 mr-1" />
+                          <span className="text-sm">{property.location}</span>
+                        </div>
+                      </div>
+                      <Badge className="bg-blue-100 text-blue-800 rounded-full">
+                        {property.type}
+                      </Badge>
+                    </div>
+                    
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="text-2xl font-bold text-blue-600">
+                        KSh {property.rent.toLocaleString()}
+                        <span className="text-sm text-gray-500 font-normal">/month</span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center space-x-2 mb-4">
+                      {property.features.slice(0, 3).map((feature, index) => (
+                        <Badge key={index} variant="secondary" className="text-xs rounded-full">
+                          {feature}
+                        </Badge>
+                      ))}
+                      {property.features.length > 3 && (
+                        <Badge variant="secondary" className="text-xs rounded-full">
+                          +{property.features.length - 3} more
+                        </Badge>
+                      )}
+                    </div>
+
+                    <div className="space-y-3">
+                      <Link to={`/property/${property.id}`} className="block">
+                        <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-2xl">
+                          <Eye className="w-4 h-4 mr-2" />
+                          View Details
+                        </Button>
+                      </Link>
+                      
+                      <div className="grid grid-cols-2 gap-2">
+                        <Button 
+                          onClick={() => handlePayment(property.id, 'rent')}
+                          variant="outline" 
+                          className="rounded-2xl text-xs py-2"
+                        >
+                          <DollarSign className="w-3 h-3 mr-1" />
+                          Pay Rent
+                        </Button>
+                        <Button 
+                          onClick={() => handlePayment(property.id, 'deposit')}
+                          variant="outline" 
+                          className="rounded-2xl text-xs py-2"
+                        >
+                          <Building2 className="w-3 h-3 mr-1" />
+                          Pay Deposit
+                        </Button>
+                      </div>
+                      
+                      <Link to={`/apply/${property.id}`} className="block">
+                        <Button variant="outline" className="w-full rounded-2xl">
+                          <User className="w-4 h-4 mr-2" />
+                          Apply Now
+                        </Button>
+                      </Link>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             ))}
           </div>
         </div>
-      ) : (
-        <div className="h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50">
-          <div className="text-center py-8 animate-scale-in px-6">
-            <div className="relative mb-6">
-              <div className="w-24 h-24 bg-gradient-to-br from-pink-500 via-purple-500 to-blue-500 rounded-full flex items-center justify-center mx-auto shadow-2xl">
-                <Heart className="w-12 h-12 text-white animate-pulse" />
-              </div>
-              <div className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full flex items-center justify-center animate-bounce">
-                <Sparkles className="w-4 h-4 text-white" />
-              </div>
-            </div>
-            <h3 className="text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-3">
-              That's all for now!
-            </h3>
-            <p className="text-gray-600 mb-8 leading-relaxed px-4">
-              You've seen all available properties matching your filters. Check back later for new listings!
+
+        {/* Mobile Swipe View */}
+        <div className="lg:hidden">
+          <PropertySwipeCard 
+            properties={filteredProperties}
+            favorites={favorites}
+            onToggleFavorite={toggleFavorite}
+          />
+        </div>
+
+        {/* Empty State */}
+        {filteredProperties.length === 0 && (
+          <div className="text-center mt-10">
+            <h2 className="text-xl font-semibold text-gray-700 mb-4">
+              No properties found matching your criteria.
+            </h2>
+            <p className="text-gray-500">
+              Please adjust your filters and try again.
             </p>
-            <div className="space-y-3">
-              <Button 
-                onClick={resetStack}
-                className="bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 hover:from-pink-600 hover:via-purple-600 hover:to-blue-600 text-white rounded-2xl px-8 py-4 text-base font-semibold shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105"
-              >
-                <Heart className="w-5 h-5 mr-2" />
-                Start Over
-              </Button>
-              <Button 
-                onClick={() => setShowOnboarding(true)}
-                variant="outline"
-                className="rounded-2xl px-8 py-4 text-base font-semibold border-2 border-purple-200 hover:bg-purple-50 transition-all duration-300 hover:scale-105"
-              >
-                <User className="w-5 h-5 mr-2" />
-                Complete Profile
-              </Button>
-            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Enhanced Action Buttons - Fixed at bottom */}
-      {hasMoreProperties && (
-        <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 flex items-center justify-center space-x-8 z-50">
-          <Button
-            onClick={() => currentProperty && handleSwipe('left', currentProperty.id)}
-            className="w-16 h-16 rounded-full bg-white shadow-2xl hover:shadow-3xl border-0 hover:scale-110 transition-all duration-300 group"
-            variant="ghost"
-          >
-            <X className="w-7 h-7 text-red-500 group-hover:scale-110 transition-transform duration-200" />
-          </Button>
-          
-          <Link to={currentProperty ? `/property/${currentProperty.id}` : '#'}>
-            <Button className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-100 to-purple-100 shadow-xl hover:shadow-2xl border-0 hover:scale-110 transition-all duration-300 group" variant="ghost">
-              <Info className="w-6 h-6 text-blue-600 group-hover:scale-110 transition-transform duration-200" />
+        {/* Pagination (Example - replace with actual pagination logic) */}
+        {filteredProperties.length > 0 && (
+          <div className="flex justify-center mt-8">
+            <Button variant="outline" className="mr-2 rounded-2xl">
+              Previous
             </Button>
-          </Link>
-          
-          <Button
-            onClick={() => currentProperty && handleSwipe('right', currentProperty.id)}
-            className="w-16 h-16 rounded-full bg-gradient-to-r from-pink-500 via-red-500 to-pink-500 shadow-2xl hover:shadow-3xl hover:scale-110 transition-all duration-300 group relative overflow-hidden"
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-pink-400 via-red-400 to-pink-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-            <Heart className="w-7 h-7 text-white group-hover:scale-110 transition-transform duration-200 relative z-10" />
-          </Button>
-        </div>
-      )}
-
-      {/* Enhanced Match Counter */}
-      {hasMoreProperties && likedProperties.length > 0 && (
-        <div className="fixed top-32 right-4 z-50 animate-bounce">
-          <div className="bg-gradient-to-r from-pink-500 to-red-500 text-white rounded-full px-4 py-2 shadow-xl flex items-center space-x-2">
-            <Heart className="w-4 h-4 animate-pulse" />
-            <span className="text-sm font-bold">{likedProperties.length}</span>
-            <Sparkles className="w-4 h-4" />
+            <Button variant="outline" className="rounded-2xl">
+              Next
+            </Button>
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
-      {/* Progress Indicator */}
-      {hasMoreProperties && (
-        <div className="fixed bottom-32 left-1/2 transform -translate-x-1/2 z-50">
-          <div className="flex space-x-2">
-            {filteredProperties.slice(0, Math.min(5, filteredProperties.length)).map((_, index) => (
-              <div
-                key={index}
-                className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                  index === currentPropertyIndex 
-                    ? 'bg-gradient-to-r from-pink-500 to-purple-500 scale-125' 
-                    : index < currentPropertyIndex 
-                      ? 'bg-gray-400' 
-                      : 'bg-gray-200'
-                }`}
-              />
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Filters Modal */}
-      <PropertyFilters 
-        isOpen={showFilters}
-        onClose={() => setShowFilters(false)}
-        filters={filters}
-        onFiltersChange={setFilters}
-      />
-
-      {/* Enhanced Onboarding Modal */}
+      {/* Modals */}
       <OnboardingModal 
         isOpen={showOnboarding} 
         onClose={() => setShowOnboarding(false)} 
+      />
+      
+      <PaymentModal
+        isOpen={paymentModal.isOpen}
+        onClose={closePaymentModal}
+        paymentType={paymentModal.paymentType}
+        amount={paymentModal.amount}
       />
     </div>
   );

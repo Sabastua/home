@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { MapPin, Calendar, Check, ArrowLeft, Phone, Mail, Home, Wifi, Car, Shield, Building2, MessageCircle, Eye, Heart, User } from 'lucide-react';
+import { MapPin, Calendar, Check, ArrowLeft, Phone, Mail, Home, Wifi, Car, Shield, Building2, MessageCircle, Eye, Heart, User, DollarSign } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import PaymentModal from '@/components/PaymentModal';
 
 // Enhanced property data with comprehensive information for all 10 properties
 const propertyData = {
@@ -414,6 +415,11 @@ const propertyData = {
 const PropertyDetail = () => {
   const { id } = useParams<{ id: string }>();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [paymentModal, setPaymentModal] = useState({
+    isOpen: false,
+    paymentType: 'rent' as 'rent' | 'water' | 'deposit',
+    amount: 0
+  });
   
   const propertyId = parseInt(id || '1', 10);
   const property = propertyData[propertyId as keyof typeof propertyData];
@@ -425,6 +431,28 @@ const PropertyDetail = () => {
   const handleWhatsApp = () => {
     const message = `Hi ${property.agent.name}, I'm interested in the ${property.title} at ${property.location}. Can we discuss?`;
     window.open(`https://wa.me/${property.agent.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(message)}`, '_blank');
+  };
+
+  const handlePayment = (type: 'rent' | 'water' | 'deposit') => {
+    if (!property) return;
+    
+    let amount = property.rent;
+    if (type === 'water') amount = Math.floor(property.rent * 0.1); // 10% of rent
+    if (type === 'deposit') amount = property.rent * 2; // 2 months deposit
+    
+    setPaymentModal({
+      isOpen: true,
+      paymentType: type,
+      amount
+    });
+  };
+
+  const closePaymentModal = () => {
+    setPaymentModal({
+      isOpen: false,
+      paymentType: 'rent',
+      amount: 0
+    });
   };
 
   if (!property) {
@@ -560,13 +588,45 @@ const PropertyDetail = () => {
               </CardContent>
             </Card>
 
+            {/* Payment Section */}
+            <Card className="rounded-3xl border-0 shadow-sm">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-lg">Quick Payments</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <Button 
+                  onClick={() => handlePayment('rent')}
+                  className="w-full bg-green-600 hover:bg-green-700 text-white rounded-2xl py-3"
+                >
+                  <DollarSign className="w-4 h-4 mr-2" />
+                  Pay Rent - KSh {property.rent.toLocaleString()}
+                </Button>
+                <Button 
+                  onClick={() => handlePayment('deposit')}
+                  variant="outline"
+                  className="w-full rounded-2xl py-3 border-2 hover:bg-gray-50"
+                >
+                  <Building2 className="w-4 h-4 mr-2" />
+                  Pay Deposit - KSh {(property.rent * 2).toLocaleString()}
+                </Button>
+                <Button 
+                  onClick={() => handlePayment('water')}
+                  variant="outline"
+                  className="w-full rounded-2xl py-3 border-2 hover:bg-gray-50"
+                >
+                  <DollarSign className="w-4 h-4 mr-2" />
+                  Pay Water - KSh {Math.floor(property.rent * 0.1).toLocaleString()}
+                </Button>
+              </CardContent>
+            </Card>
+
             {/* Contact Agent */}
             <Card className="rounded-3xl border-0 shadow-sm">
               <CardHeader className="pb-4">
                 <CardTitle className="text-lg">Contact Agent</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="flex items-center space-x-4 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl">
+                <div className="flex items-center space-x-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl">
                   <img 
                     src={property.agent.image} 
                     alt={property.agent.name}
@@ -713,6 +773,14 @@ const PropertyDetail = () => {
           </div>
         </div>
       </div>
+
+      {/* Payment Modal */}
+      <PaymentModal
+        isOpen={paymentModal.isOpen}
+        onClose={closePaymentModal}
+        paymentType={paymentModal.paymentType}
+        amount={paymentModal.amount}
+      />
     </div>
   );
 };
