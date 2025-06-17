@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { MapPin, Heart, Eye, DollarSign, Building2, User, Phone, MessageCircle } from 'lucide-react';
@@ -9,7 +10,7 @@ import PropertyFilters from '@/components/PropertyFilters';
 import OnboardingModal from '@/components/OnboardingModal';
 import PaymentModal from '@/components/PaymentModal';
 
-// Mock property data (replace with your actual data source)
+// Mock property data with comprehensive information
 const propertyData = [
   {
     id: 1,
@@ -18,7 +19,25 @@ const propertyData = [
     location: "Nakuru Town",
     rent: 25000,
     image: "https://images.unsplash.com/photo-1721322800607-8c38375eef04?w=800&h=600&fit=crop",
-    features: ["Water included", "Parking", "Security"]
+    images: [
+      "https://images.unsplash.com/photo-1721322800607-8c38375eef04?w=800&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&h=600&fit=crop"
+    ],
+    features: ["Water included", "Parking", "Security", "WiFi", "Modern Kitchen", "Balcony"],
+    available: true,
+    rating: 4.5,
+    reviews: 12,
+    plotNumber: "NK001",
+    description: "A beautifully designed modern apartment in the heart of Nakuru Town.",
+    bedrooms: 2,
+    bathrooms: 2,
+    size: "80 sqm",
+    yearBuilt: 2020,
+    landlord: {
+      name: "John Kamau",
+      phone: "+254712345678",
+      email: "john.kamau@email.com"
+    }
   },
   {
     id: 2,
@@ -27,7 +46,25 @@ const propertyData = [
     location: "Lanet",
     rent: 8000,
     image: "https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=800&h=600&fit=crop",
-    features: ["Furnished", "Water included", "WiFi"]
+    images: [
+      "https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=800&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop"
+    ],
+    features: ["Furnished", "Water included", "WiFi", "Security"],
+    available: true,
+    rating: 4.2,
+    reviews: 8,
+    plotNumber: "LN002",
+    description: "Perfect for students and young professionals. Fully furnished and ready to move in.",
+    bedrooms: 1,
+    bathrooms: 1,
+    size: "25 sqm",
+    yearBuilt: 2019,
+    landlord: {
+      name: "Mary Wanjiku",
+      phone: "+254723456789",
+      email: "mary.wanjiku@email.com"
+    }
   },
   {
     id: 3,
@@ -36,7 +73,25 @@ const propertyData = [
     location: "Njoro",
     rent: 35000,
     image: "https://images.unsplash.com/photo-1487958449943-2429e8be8625?w=800&h=600&fit=crop",
-    features: ["Own Compound", "Garden", "Parking"]
+    images: [
+      "https://images.unsplash.com/photo-1487958449943-2429e8be8625?w=800&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&h=600&fit=crop"
+    ],
+    features: ["Own Compound", "Garden", "Parking", "Security", "Generator", "WiFi"],
+    available: true,
+    rating: 4.7,
+    reviews: 15,
+    plotNumber: "NJ003",
+    description: "A family-friendly house with a beautiful garden and secure compound.",
+    bedrooms: 3,
+    bathrooms: 2,
+    size: "120 sqm",
+    yearBuilt: 2018,
+    landlord: {
+      name: "Peter Kiprop",
+      phone: "+254734567890",
+      email: "peter.kiprop@email.com"
+    }
   },
   {
     id: 4,
@@ -45,7 +100,25 @@ const propertyData = [
     location: "Rongai",
     rent: 12000,
     image: "https://images.unsplash.com/photo-1518005020951-eccb494ad742?w=800&h=600&fit=crop",
-    features: ["Modern", "Security", "Water included"]
+    images: [
+      "https://images.unsplash.com/photo-1518005020951-eccb494ad742?w=800&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=800&h=600&fit=crop"
+    ],
+    features: ["Modern", "Security", "Water included", "Parking"],
+    available: true,
+    rating: 4.3,
+    reviews: 10,
+    plotNumber: "RG004",
+    description: "Modern studio apartment perfect for singles or couples.",
+    bedrooms: 1,
+    bathrooms: 1,
+    size: "35 sqm",
+    yearBuilt: 2021,
+    landlord: {
+      name: "Grace Nyambura",
+      phone: "+254745678901",
+      email: "grace.nyambura@email.com"
+    }
   },
   {
     id: 5,
@@ -54,7 +127,25 @@ const propertyData = [
     location: "Milimani",
     rent: 55000,
     image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&h=600&fit=crop",
-    features: ["Swimming Pool", "Garden", "Parking", "Security", "Generator", "WiFi", "Gym"]
+    images: [
+      "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1600607687644-aac4c3eac7f4?w=800&h=600&fit=crop"
+    ],
+    features: ["Swimming Pool", "Garden", "Parking", "Security", "Generator", "WiFi", "Gym", "Study Room"],
+    available: true,
+    rating: 4.9,
+    reviews: 25,
+    plotNumber: "ML005",
+    description: "Luxury villa with premium amenities in the prestigious Milimani area.",
+    bedrooms: 4,
+    bathrooms: 3,
+    size: "200 sqm",
+    yearBuilt: 2022,
+    landlord: {
+      name: "David Mwangi",
+      phone: "+254756789012",
+      email: "david.mwangi@email.com"
+    }
   },
   {
     id: 6,
@@ -63,7 +154,25 @@ const propertyData = [
     location: "Section 58",
     rent: 18000,
     image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&h=600&fit=crop",
-    features: ["Garden View", "Parking", "Security", "Water included", "WiFi"]
+    images: [
+      "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1721322800607-8c38375eef04?w=800&h=600&fit=crop"
+    ],
+    features: ["Garden View", "Parking", "Security", "Water included", "WiFi"],
+    available: true,
+    rating: 4.4,
+    reviews: 18,
+    plotNumber: "S8006",
+    description: "Serene apartment with beautiful garden views and modern amenities.",
+    bedrooms: 1,
+    bathrooms: 1,
+    size: "45 sqm",
+    yearBuilt: 2020,
+    landlord: {
+      name: "Susan Achieng",
+      phone: "+254767890123",
+      email: "susan.achieng@email.com"
+    }
   },
   {
     id: 7,
@@ -72,7 +181,25 @@ const propertyData = [
     location: "Nakuru East",
     rent: 42000,
     image: "https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=800&h=600&fit=crop",
-    features: ["Rooftop Terrace", "Modern Kitchen", "Parking", "Security", "Generator", "WiFi"]
+    images: [
+      "https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=800&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1487958449943-2429e8be8625?w=800&h=600&fit=crop"
+    ],
+    features: ["Rooftop Terrace", "Modern Kitchen", "Parking", "Security", "Generator", "WiFi"],
+    available: false,
+    rating: 4.6,
+    reviews: 14,
+    plotNumber: "NE007",
+    description: "Stunning penthouse with rooftop terrace and panoramic city views.",
+    bedrooms: 3,
+    bathrooms: 2,
+    size: "150 sqm",
+    yearBuilt: 2021,
+    landlord: {
+      name: "James Ochieng",
+      phone: "+254778901234",
+      email: "james.ochieng@email.com"
+    }
   },
   {
     id: 8,
@@ -81,7 +208,25 @@ const propertyData = [
     location: "Kaptembwo",
     rent: 6500,
     image: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop",
-    features: ["Water included", "Security", "Parking"]
+    images: [
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=800&h=600&fit=crop"
+    ],
+    features: ["Water included", "Security", "Parking"],
+    available: true,
+    rating: 4.0,
+    reviews: 6,
+    plotNumber: "KT008",
+    description: "Budget-friendly bedsitter in a quiet neighborhood with essential amenities.",
+    bedrooms: 1,
+    bathrooms: 1,
+    size: "20 sqm",
+    yearBuilt: 2017,
+    landlord: {
+      name: "Rose Mutua",
+      phone: "+254789012345",
+      email: "rose.mutua@email.com"
+    }
   },
   {
     id: 9,
@@ -90,7 +235,25 @@ const propertyData = [
     location: "Bahati",
     rent: 22000,
     image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&h=600&fit=crop",
-    features: ["Duplex Design", "Garden", "Parking", "Security", "Water included", "WiFi"]
+    images: [
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&h=600&fit=crop"
+    ],
+    features: ["Duplex Design", "Garden", "Parking", "Security", "Water included", "WiFi"],
+    available: true,
+    rating: 4.5,
+    reviews: 20,
+    plotNumber: "BH009",
+    description: "Unique duplex design offering extra space and privacy for families.",
+    bedrooms: 2,
+    bathrooms: 2,
+    size: "90 sqm",
+    yearBuilt: 2019,
+    landlord: {
+      name: "Michael Kariuki",
+      phone: "+254790123456",
+      email: "michael.kariuki@email.com"
+    }
   },
   {
     id: 10,
@@ -99,7 +262,25 @@ const propertyData = [
     location: "Upperhill",
     rent: 85000,
     image: "https://images.unsplash.com/photo-1600607687644-aac4c3eac7f4?w=800&h=600&fit=crop",
-    features: ["Swimming Pool", "Garden", "Parking", "Security", "Generator", "WiFi", "Gym", "Sauna", "Study Room"]
+    images: [
+      "https://images.unsplash.com/photo-1600607687644-aac4c3eac7f4?w=800&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&h=600&fit=crop"
+    ],
+    features: ["Swimming Pool", "Garden", "Parking", "Security", "Generator", "WiFi", "Gym", "Sauna", "Study Room"],
+    available: true,
+    rating: 5.0,
+    reviews: 30,
+    plotNumber: "UH010",
+    description: "Ultimate luxury mansion with world-class amenities and stunning architecture.",
+    bedrooms: 5,
+    bathrooms: 4,
+    size: "350 sqm",
+    yearBuilt: 2023,
+    landlord: {
+      name: "Catherine Njeri",
+      phone: "+254701234567",
+      email: "catherine.njeri@email.com"
+    }
   }
 ];
 
@@ -109,6 +290,7 @@ const Index = () => {
   const [favorites, setFavorites] = useState<number[]>([]);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [currentSwipeIndex, setCurrentSwipeIndex] = useState(0);
   const [paymentModal, setPaymentModal] = useState({
     isOpen: false,
     propertyId: null as number | null,
@@ -143,32 +325,17 @@ const Index = () => {
     );
   };
 
-  const filterProperties = (filters: any) => {
-    setFilteredProperties(() => {
-      let filtered = [...properties];
-
-      if (filters.location) {
-        filtered = filtered.filter(property =>
-          property.location.toLowerCase().includes(filters.location.toLowerCase())
-        );
-      }
-
-      if (filters.type) {
-        filtered = filtered.filter(property =>
-          property.type.toLowerCase() === filters.type.toLowerCase()
-        );
-      }
-
-      if (filters.minRent) {
-        filtered = filtered.filter(property => property.rent >= filters.minRent);
-      }
-
-      if (filters.maxRent) {
-        filtered = filtered.filter(property => property.rent <= filters.maxRent);
-      }
-
-      return filtered;
-    });
+  const handleSwipe = (direction: 'left' | 'right', propertyId: number) => {
+    if (direction === 'right') {
+      toggleFavorite(propertyId);
+    }
+    
+    // Move to next property
+    if (currentSwipeIndex < filteredProperties.length - 1) {
+      setCurrentSwipeIndex(currentSwipeIndex + 1);
+    } else {
+      setCurrentSwipeIndex(0); // Loop back to first property
+    }
   };
 
   const handlePayment = (propertyId: number, type: 'rent' | 'water' | 'deposit') => {
@@ -244,10 +411,7 @@ const Index = () => {
         </div>
 
         {/* Filters */}
-        <PropertyFilters 
-          properties={properties}
-          onFilterChange={setFilteredProperties}
-        />
+        <PropertyFilters onFilterChange={setFilteredProperties} />
 
         {/* Properties Grid - Desktop */}
         <div className="hidden lg:block">
@@ -274,8 +438,8 @@ const Index = () => {
                       </button>
                     </div>
                     <div className="absolute bottom-4 left-4">
-                      <Badge className="bg-green-500/90 text-white rounded-full shadow-lg backdrop-blur-sm">
-                        Available
+                      <Badge className={`${property.available ? 'bg-green-500/90' : 'bg-red-500/90'} text-white rounded-full shadow-lg backdrop-blur-sm`}>
+                        {property.available ? 'Available' : 'Occupied'}
                       </Badge>
                     </div>
                   </div>
@@ -318,7 +482,7 @@ const Index = () => {
                       <Link to={`/property/${property.id}`} className="block">
                         <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-2xl">
                           <Eye className="w-4 h-4 mr-2" />
-                          View Details
+                          View Details & Book
                         </Button>
                       </Link>
                       
@@ -357,11 +521,20 @@ const Index = () => {
 
         {/* Mobile Swipe View */}
         <div className="lg:hidden">
-          <PropertySwipeCard 
-            properties={filteredProperties}
-            favorites={favorites}
-            onToggleFavorite={toggleFavorite}
-          />
+          {filteredProperties.length > 0 && currentSwipeIndex < filteredProperties.length && (
+            <div className="relative">
+              {/* Stack of cards for swipe effect */}
+              {filteredProperties.slice(currentSwipeIndex, currentSwipeIndex + 3).map((property, index) => (
+                <PropertySwipeCard 
+                  key={property.id}
+                  property={property}
+                  index={index}
+                  onSwipe={handleSwipe}
+                  isActive={index === 0}
+                />
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Empty State */}
