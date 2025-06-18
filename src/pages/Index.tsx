@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, Heart, MapPin, Star, User, Menu } from 'lucide-react';
@@ -8,6 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import MobileSwipeView from '@/components/MobileSwipeView';
+import PaymentButton from '@/components/PaymentButton';
 
 const mockProperties = [
   {
@@ -370,11 +370,19 @@ const Index = () => {
                   <span className="text-sm text-gray-500">{property.beds} bed • {property.baths} bath</span>
                 </div>
                 
-                <Link to={`/property/${property.id}`}>
-                  <Button className="w-full bg-gradient-to-r from-green-600 to-red-600 hover:from-green-700 hover:to-red-700 text-white rounded-2xl font-semibold">
-                    View Details
-                  </Button>
-                </Link>
+                <div className="space-y-2">
+                  <Link to={`/property/${property.id}`}>
+                    <Button variant="outline" className="w-full rounded-2xl font-semibold">
+                      View Details
+                    </Button>
+                  </Link>
+                  <PaymentButton
+                    propertyId={property.id}
+                    propertyTitle={property.title}
+                    rent={property.rent}
+                    waterBill={property.waterBillCost}
+                  />
+                </div>
               </CardContent>
             </Card>
           ))}

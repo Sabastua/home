@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -7,7 +6,9 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Upload, Edit, Trash2, Eye, Plus, MapPin, DollarSign } from 'lucide-react';
+import { Upload, Edit, Trash2, Eye, Plus, MapPin, DollarSign, Camera, Video } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 // Enhanced mock data for 10 properties with comprehensive information
 const mockProperties = [
@@ -90,7 +91,7 @@ const mockProperties = [
     rent: 18000,
     status: 'vacant',
     tenant: null,
-    image: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=400&h=300&fit=crop',
+    image: 'https://images.unsplash.com/photo-1512917774080-9991f1c3d0e2?w=400&h=300&fit=crop',
     lastPayment: null,
     dateAdded: '2024-03-01',
     features: ['Garden View', 'Parking', 'Security', 'Water included', 'WiFi']
@@ -159,13 +160,21 @@ const PropertyManagement = () => {
   const [showAddForm, setShowAddForm] = useState(false);
   const [newProperty, setNewProperty] = useState({
     plotNumber: '',
+    plotName: '',
     title: '',
     type: '',
     location: '',
+    neighborhood: '',
     rent: '',
+    waterBillCost: '',
     image: '',
-    features: ''
+    plotImages: [],
+    plotVideos: [],
+    features: '',
+    description: ''
   });
+
+  const [mediaUploadType, setMediaUploadType] = useState('image');
 
   const handleAddProperty = (e: React.FormEvent) => {
     e.preventDefault();
@@ -173,15 +182,69 @@ const PropertyManagement = () => {
       id: properties.length + 1,
       ...newProperty,
       rent: Number(newProperty.rent),
+      waterBillCost: Number(newProperty.waterBillCost),
       status: 'vacant',
       tenant: null,
       lastPayment: null,
       dateAdded: new Date().toISOString().split('T')[0],
-      features: newProperty.features.split(',').map(f => f.trim())
+      features: newProperty.features.split(',').map(f => f.trim()),
+      images: [...newProperty.plotImages],
+      available: true,
+      rating: 0,
+      reviews: 0,
+      beds: 0,
+      baths: 1
     };
     setProperties([...properties, property]);
-    setNewProperty({ plotNumber: '', title: '', type: '', location: '', rent: '', image: '', features: '' });
+    setNewProperty({ 
+      plotNumber: '', 
+      plotName: '',
+      title: '', 
+      type: '', 
+      location: '', 
+      neighborhood: '',
+      rent: '', 
+      waterBillCost: '',
+      image: '', 
+      plotImages: [],
+      plotVideos: [],
+      features: '',
+      description: ''
+    });
     setShowAddForm(false);
+  };
+
+  const handleMediaUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    // In a real app, you would upload these files to a server
+    // For now, we'll create object URLs for preview
+    const urls = files.map(file => URL.createObjectURL(file));
+    
+    if (mediaUploadType === 'image') {
+      setNewProperty(prev => ({
+        ...prev,
+        plotImages: [...prev.plotImages, ...urls]
+      }));
+    } else {
+      setNewProperty(prev => ({
+        ...prev,
+        plotVideos: [...prev.plotVideos, ...urls]
+      }));
+    }
+  };
+
+  const removePlotMedia = (index: number, type: 'image' | 'video') => {
+    if (type === 'image') {
+      setNewProperty(prev => ({
+        ...prev,
+        plotImages: prev.plotImages.filter((_, i) => i !== index)
+      }));
+    } else {
+      setNewProperty(prev => ({
+        ...prev,
+        plotVideos: prev.plotVideos.filter((_, i) => i !== index)
+      }));
+    }
   };
 
   const getStatusColor = (status: string) => {
@@ -275,64 +338,106 @@ const PropertyManagement = () => {
             <CardTitle>Add New Property</CardTitle>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleAddProperty} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <form onSubmit={handleAddProperty} className="space-y-6">
+              {/* Basic Property Information */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="plotNumber">Plot Number</Label>
+                  <Input
+                    id="plotNumber"
+                    value={newProperty.plotNumber}
+                    onChange={(e) => setNewProperty(prev => ({ ...prev, plotNumber: e.target.value }))}
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="plotName">Plot Name</Label>
+                  <Input
+                    id="plotName"
+                    value={newProperty.plotName}
+                    onChange={(e) => setNewProperty(prev => ({ ...prev, plotName: e.target.value }))}
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="title">Property Title</Label>
+                  <Input
+                    id="title"
+                    value={newProperty.title}
+                    onChange={(e) => setNewProperty(prev => ({ ...prev, title: e.target.value }))}
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="type">Property Type</Label>
+                  <Select onValueChange={(value) => setNewProperty(prev => ({ ...prev, type: value }))}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select property type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Bedsitter">Bedsitter</SelectItem>
+                      <SelectItem value="Studio">Studio</SelectItem>
+                      <SelectItem value="1BR">1 Bedroom</SelectItem>
+                      <SelectItem value="2BR">2 Bedroom</SelectItem>
+                      <SelectItem value="3BR">3 Bedroom</SelectItem>
+                      <SelectItem value="4BR">4 Bedroom</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="location">Location</Label>
+                  <Input
+                    id="location"
+                    value={newProperty.location}
+                    onChange={(e) => setNewProperty(prev => ({ ...prev, location: e.target.value }))}
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="neighborhood">Neighborhood</Label>
+                  <Input
+                    id="neighborhood"
+                    value={newProperty.neighborhood}
+                    onChange={(e) => setNewProperty(prev => ({ ...prev, neighborhood: e.target.value }))}
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="rent">Monthly Rent (KSh)</Label>
+                  <Input
+                    id="rent"
+                    type="number"
+                    value={newProperty.rent}
+                    onChange={(e) => setNewProperty(prev => ({ ...prev, rent: e.target.value }))}
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="waterBillCost">Water Bill Cost (KSh)</Label>
+                  <Input
+                    id="waterBillCost"
+                    type="number"
+                    value={newProperty.waterBillCost}
+                    onChange={(e) => setNewProperty(prev => ({ ...prev, waterBillCost: e.target.value }))}
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Description */}
               <div>
-                <Label htmlFor="plotNumber">Plot Number</Label>
-                <Input
-                  id="plotNumber"
-                  value={newProperty.plotNumber}
-                  onChange={(e) => setNewProperty(prev => ({ ...prev, plotNumber: e.target.value }))}
-                  required
+                <Label htmlFor="description">Property Description</Label>
+                <Textarea
+                  id="description"
+                  value={newProperty.description}
+                  onChange={(e) => setNewProperty(prev => ({ ...prev, description: e.target.value }))}
+                  placeholder="Describe the property in detail..."
+                  rows={3}
                 />
               </div>
+
+              {/* Features */}
               <div>
-                <Label htmlFor="title">Property Title</Label>
-                <Input
-                  id="title"
-                  value={newProperty.title}
-                  onChange={(e) => setNewProperty(prev => ({ ...prev, title: e.target.value }))}
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="type">Property Type</Label>
-                <Input
-                  id="type"
-                  value={newProperty.type}
-                  onChange={(e) => setNewProperty(prev => ({ ...prev, type: e.target.value }))}
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="location">Location</Label>
-                <Input
-                  id="location"
-                  value={newProperty.location}
-                  onChange={(e) => setNewProperty(prev => ({ ...prev, location: e.target.value }))}
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="rent">Monthly Rent (KSh)</Label>
-                <Input
-                  id="rent"
-                  type="number"
-                  value={newProperty.rent}
-                  onChange={(e) => setNewProperty(prev => ({ ...prev, rent: e.target.value }))}
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="image">Image URL</Label>
-                <Input
-                  id="image"
-                  type="url"
-                  value={newProperty.image}
-                  onChange={(e) => setNewProperty(prev => ({ ...prev, image: e.target.value }))}
-                  placeholder="https://example.com/image.jpg"
-                />
-              </div>
-              <div className="md:col-span-2">
                 <Label htmlFor="features">Features (comma-separated)</Label>
                 <Input
                   id="features"
@@ -341,7 +446,102 @@ const PropertyManagement = () => {
                   placeholder="WiFi, Parking, Security, Water included"
                 />
               </div>
-              <div className="md:col-span-2 flex gap-2">
+
+              {/* Media Upload Section */}
+              <div className="space-y-4">
+                <div>
+                  <Label>Plot Media</Label>
+                  <div className="flex gap-2 mb-4">
+                    <Button
+                      type="button"
+                      variant={mediaUploadType === 'image' ? 'default' : 'outline'}
+                      onClick={() => setMediaUploadType('image')}
+                      size="sm"
+                    >
+                      <Camera className="w-4 h-4 mr-2" />
+                      Images
+                    </Button>
+                    <Button
+                      type="button"
+                      variant={mediaUploadType === 'video' ? 'default' : 'outline'}
+                      onClick={() => setMediaUploadType('video')}
+                      size="sm"
+                    >
+                      <Video className="w-4 h-4 mr-2" />
+                      Videos
+                    </Button>
+                  </div>
+                  
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                    <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                    <p className="text-gray-600 mb-2">
+                      Upload {mediaUploadType === 'image' ? 'images' : 'videos'} of the plot
+                    </p>
+                    <Input
+                      type="file"
+                      multiple
+                      accept={mediaUploadType === 'image' ? 'image/*' : 'video/*'}
+                      onChange={handleMediaUpload}
+                      className="max-w-xs"
+                    />
+                  </div>
+                </div>
+
+                {/* Preview uploaded media */}
+                {newProperty.plotImages.length > 0 && (
+                  <div>
+                    <Label>Uploaded Images</Label>
+                    <div className="grid grid-cols-3 gap-2 mt-2">
+                      {newProperty.plotImages.map((url, index) => (
+                        <div key={index} className="relative">
+                          <img
+                            src={url}
+                            alt={`Plot ${index + 1}`}
+                            className="w-full h-20 object-cover rounded border"
+                          />
+                          <Button
+                            type="button"
+                            variant="destructive"
+                            size="sm"
+                            className="absolute top-1 right-1 w-6 h-6 p-0"
+                            onClick={() => removePlotMedia(index, 'image')}
+                          >
+                            ×
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {newProperty.plotVideos.length > 0 && (
+                  <div>
+                    <Label>Uploaded Videos</Label>
+                    <div className="grid grid-cols-2 gap-2 mt-2">
+                      {newProperty.plotVideos.map((url, index) => (
+                        <div key={index} className="relative">
+                          <video
+                            src={url}
+                            className="w-full h-20 object-cover rounded border"
+                            controls
+                          />
+                          <Button
+                            type="button"
+                            variant="destructive"
+                            size="sm"
+                            className="absolute top-1 right-1 w-6 h-6 p-0"
+                            onClick={() => removePlotMedia(index, 'video')}
+                          >
+                            ×
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex gap-2">
                 <Button type="submit" className="bg-green-600 hover:bg-green-700">
                   Add Property
                 </Button>
@@ -354,6 +554,7 @@ const PropertyManagement = () => {
         </Card>
       )}
 
+      {/* Properties Table */}
       <Card>
         <CardHeader>
           <CardTitle>Properties Overview</CardTitle>
@@ -366,10 +567,11 @@ const PropertyManagement = () => {
                 <TableHead>Property</TableHead>
                 <TableHead>Type</TableHead>
                 <TableHead>Location</TableHead>
+                <TableHead>Neighborhood</TableHead>
                 <TableHead>Rent</TableHead>
+                <TableHead>Water Bill</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Tenant</TableHead>
-                <TableHead>Last Payment</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -396,10 +598,17 @@ const PropertyManagement = () => {
                       {property.location}
                     </div>
                   </TableCell>
+                  <TableCell>{property.neighborhood || 'N/A'}</TableCell>
                   <TableCell>
                     <div className="flex items-center">
                       <DollarSign className="w-4 h-4 mr-1 text-gray-400" />
                       KSh {property.rent.toLocaleString()}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center">
+                      <DollarSign className="w-4 h-4 mr-1 text-gray-400" />
+                      KSh {property.waterBillCost ? property.waterBillCost.toLocaleString() : 'N/A'}
                     </div>
                   </TableCell>
                   <TableCell>
@@ -408,7 +617,6 @@ const PropertyManagement = () => {
                     </Badge>
                   </TableCell>
                   <TableCell>{property.tenant || 'N/A'}</TableCell>
-                  <TableCell>{property.lastPayment || 'N/A'}</TableCell>
                   <TableCell>
                     <div className="flex space-x-2">
                       <Button size="sm" variant="outline">
