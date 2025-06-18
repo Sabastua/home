@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, Heart, MapPin, Star, User, Menu } from 'lucide-react';
@@ -15,10 +16,17 @@ const mockProperties = [
     location: 'Nakuru Town',
     rent: 8000,
     image: 'https://images.unsplash.com/photo-1512917774080-9991f1c9c7ca?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cHJvcGVydHl8ZW58MHx8MHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60',
+    images: [
+      'https://images.unsplash.com/photo-1512917774080-9991f1c9c7ca?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cHJvcGVydHl8ZW58MHx8MHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60',
+      'https://images.unsplash.com/photo-1494200426193-1c0c4efcb48f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60'
+    ],
     type: 'Bedsitter',
     rating: 4.5,
     beds: 0,
     baths: 1,
+    features: ['Water included', 'Security', 'WiFi'],
+    available: true,
+    reviews: 12,
   },
   {
     id: 2,
@@ -26,10 +34,17 @@ const mockProperties = [
     location: 'Milimani',
     rent: 25000,
     image: 'https://images.unsplash.com/photo-1494200426193-1c0c4efcb48f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fEFwYXJ0bWVudHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60',
+    images: [
+      'https://images.unsplash.com/photo-1494200426193-1c0c4efcb48f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
+      'https://images.unsplash.com/photo-1560185893-a55cbc97b59c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60'
+    ],
     type: '2BR',
     rating: 4.2,
     beds: 2,
     baths: 1,
+    features: ['Parking', 'Security', 'Modern Kitchen', 'Balcony'],
+    available: true,
+    reviews: 18,
   },
   {
     id: 3,
@@ -37,10 +52,17 @@ const mockProperties = [
     location: 'Westside',
     rent: 12000,
     image: 'https://images.unsplash.com/photo-1600585154524-164726a3a7fa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTZ8fEFwYXJ0bWVudHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60',
+    images: [
+      'https://images.unsplash.com/photo-1600585154524-164726a3a7fa?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
+      'https://images.unsplash.com/photo-1518005020951-eccb494ad742?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60'
+    ],
     type: 'Studio',
     rating: 4.8,
     beds: 0,
     baths: 1,
+    features: ['Modern', 'Security', 'Water included'],
+    available: true,
+    reviews: 25,
   },
   {
     id: 4,
@@ -48,10 +70,17 @@ const mockProperties = [
     location: 'Kiamunyi',
     rent: 40000,
     image: 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8SG91c2V8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=800&q=60',
+    images: [
+      'https://images.unsplash.com/photo-1568605114967-8130f3a36994?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
+      'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60'
+    ],
     type: '3BR',
     rating: 4.6,
     beds: 3,
     baths: 2,
+    features: ['Garden', 'Parking', 'Security', 'Generator'],
+    available: true,
+    reviews: 22,
   },
   {
     id: 5,
@@ -59,10 +88,17 @@ const mockProperties = [
     location: 'Racecourse',
     rent: 18000,
     image: 'https://images.unsplash.com/photo-1520215790490-49023c19ca80?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTd8fEFwYXJ0bWVudHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60',
+    images: [
+      'https://images.unsplash.com/photo-1520215790490-49023c19ca80?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
+      'https://images.unsplash.com/photo-1512917774080-9991f1c9c7ca?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60'
+    ],
     type: '1BR',
     rating: 4.3,
     beds: 1,
     baths: 1,
+    features: ['Parking', 'Security', 'Water included', 'WiFi'],
+    available: true,
+    reviews: 15,
   },
   {
     id: 6,
@@ -70,10 +106,17 @@ const mockProperties = [
     location: 'Section 58',
     rent: 9000,
     image: 'https://images.unsplash.com/photo-1592595539828-49624c13e6e3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjB8fEFwYXJ0bWVudHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60',
+    images: [
+      'https://images.unsplash.com/photo-1592595539828-49624c13e6e3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
+      'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60'
+    ],
     type: 'Bedsitter',
     rating: 4.1,
     beds: 0,
     baths: 1,
+    features: ['Garden View', 'Security', 'Water included'],
+    available: true,
+    reviews: 8,
   },
   {
     id: 7,
@@ -81,10 +124,17 @@ const mockProperties = [
     location: 'Naka Estate',
     rent: 28000,
     image: 'https://images.unsplash.com/photo-1570129477492-45c003dc7ddb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTh8fEhvdXNlfGVufDB8fDB8fHww&auto=format&fit=crop&w=800&q=60',
+    images: [
+      'https://images.unsplash.com/photo-1570129477492-45c003dc7ddb?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
+      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60'
+    ],
     type: '2BR',
     rating: 4.7,
     beds: 2,
     baths: 1,
+    features: ['Garden', 'Parking', 'Security', 'WiFi'],
+    available: true,
+    reviews: 30,
   },
   {
     id: 8,
@@ -92,10 +142,17 @@ const mockProperties = [
     location: 'Free Area',
     rent: 11000,
     image: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mjl8fEFwYXJ0bWVudHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60',
+    images: [
+      'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
+      'https://images.unsplash.com/photo-1649972904349-6e44c42644a7?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60'
+    ],
     type: 'Studio',
     rating: 4.0,
     beds: 0,
     baths: 1,
+    features: ['Water included', 'Security', 'Parking'],
+    available: true,
+    reviews: 12,
   },
   {
     id: 9,
@@ -103,10 +160,17 @@ const mockProperties = [
     location: 'London Estate',
     rent: 35000,
     image: 'https://images.unsplash.com/photo-1613490495763-54ed944c48ee?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MzJ8fEhvdXNlfGVufDB8fDB8fHww&auto=format&fit=crop&w=800&q=60',
+    images: [
+      'https://images.unsplash.com/photo-1613490495763-54ed944c48ee?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
+      'https://images.unsplash.com/photo-1487958449943-2429e8be8625?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60'
+    ],
     type: '3BR',
     rating: 4.4,
     beds: 3,
     baths: 2,
+    features: ['Own Compound', 'Garden', 'Parking', 'Security'],
+    available: true,
+    reviews: 18,
   },
   {
     id: 10,
@@ -114,10 +178,17 @@ const mockProperties = [
     location: 'White House',
     rent: 17000,
     image: 'https://images.unsplash.com/photo-1560185893-a55cbc97b59c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MzZ8fEFwYXJ0bWVudHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60',
+    images: [
+      'https://images.unsplash.com/photo-1560185893-a55cbc97b59c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
+      'https://images.unsplash.com/photo-1493809842364-78817add7ffb?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60'
+    ],
     type: '1BR',
     rating: 4.9,
     beds: 1,
     baths: 1,
+    features: ['Modern Kitchen', 'Parking', 'Security', 'WiFi'],
+    available: true,
+    reviews: 35,
   },
 ];
 
