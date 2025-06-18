@@ -1,641 +1,507 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Upload, Edit, Trash2, Eye, Plus, MapPin, DollarSign, Camera, Video } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-
-// Enhanced mock data for 10 properties with comprehensive information
-const mockProperties = [
-  {
-    id: 1,
-    plotNumber: 'P001',
-    title: 'Modern 2BR Apartment',
-    type: '2BR',
-    location: 'Nakuru Town',
-    rent: 25000,
-    status: 'occupied',
-    tenant: 'John Kamau',
-    image: 'https://images.unsplash.com/photo-1721322800607-8c38375eef04?w=400&h=300&fit=crop',
-    lastPayment: '2024-06-15',
-    dateAdded: '2024-01-15',
-    features: ['Water included', 'Parking', 'Security', 'WiFi', 'Generator']
-  },
-  {
-    id: 2,
-    plotNumber: 'P002',
-    title: 'Cozy Bedsitter',
-    type: 'Bedsitter',
-    location: 'Lanet',
-    rent: 8000,
-    status: 'vacant',
-    tenant: null,
-    image: 'https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=400&h=300&fit=crop',
-    lastPayment: null,
-    dateAdded: '2024-02-01',
-    features: ['Furnished', 'Water included', 'WiFi', 'Security']
-  },
-  {
-    id: 3,
-    plotNumber: 'P003',
-    title: 'Spacious 3BR House',
-    type: '3BR',
-    location: 'Njoro',
-    rent: 35000,
-    status: 'occupied',
-    tenant: 'Mary Wanjiku',
-    image: 'https://images.unsplash.com/photo-1487958449943-2429e8be8625?w=400&h=300&fit=crop',
-    lastPayment: '2024-06-10',
-    dateAdded: '2024-01-20',
-    features: ['Own Compound', 'Garden', 'Parking', 'Security', 'Generator']
-  },
-  {
-    id: 4,
-    plotNumber: 'P004',
-    title: 'Studio Apartment',
-    type: 'Studio',
-    location: 'Rongai',
-    rent: 12000,
-    status: 'occupied',
-    tenant: 'Peter Mwangi',
-    image: 'https://images.unsplash.com/photo-1518005020951-eccb494ad742?w=400&h=300&fit=crop',
-    lastPayment: '2024-06-05',
-    dateAdded: '2024-02-10',
-    features: ['Modern', 'Security', 'Water included', 'WiFi']
-  },
-  {
-    id: 5,
-    plotNumber: 'P005',
-    title: 'Executive 4BR Villa',
-    type: '4BR',
-    location: 'Milimani',
-    rent: 55000,
-    status: 'occupied',
-    tenant: 'Dr. James Mwangi',
-    image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=400&h=300&fit=crop',
-    lastPayment: '2024-06-20',
-    dateAdded: '2024-01-05',
-    features: ['Swimming Pool', 'Garden', 'Parking', 'Security', 'Generator', 'WiFi', 'Gym']
-  },
-  {
-    id: 6,
-    plotNumber: 'P006',
-    title: '1BR Garden Apartment',
-    type: '1BR',
-    location: 'Section 58',
-    rent: 18000,
-    status: 'vacant',
-    tenant: null,
-    image: 'https://images.unsplash.com/photo-1512917774080-9991f1c3d0e2?w=400&h=300&fit=crop',
-    lastPayment: null,
-    dateAdded: '2024-03-01',
-    features: ['Garden View', 'Parking', 'Security', 'Water included', 'WiFi']
-  },
-  {
-    id: 7,
-    plotNumber: 'P007',
-    title: 'Modern 3BR Penthouse',
-    type: '3BR',
-    location: 'Nakuru East',
-    rent: 42000,
-    status: 'occupied',
-    tenant: 'Sarah Njoki',
-    image: 'https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=400&h=300&fit=crop',
-    lastPayment: '2024-06-12',
-    dateAdded: '2024-02-15',
-    features: ['Rooftop Terrace', 'Modern Kitchen', 'Parking', 'Security', 'Generator', 'WiFi']
-  },
-  {
-    id: 8,
-    plotNumber: 'P008',
-    title: 'Affordable Bedsitter',
-    type: 'Bedsitter',
-    location: 'Kaptembwo',
-    rent: 6500,
-    status: 'occupied',
-    tenant: 'Grace Wangui',
-    image: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&h=300&fit=crop',
-    lastPayment: '2024-06-08',
-    dateAdded: '2024-03-10',
-    features: ['Water included', 'Security', 'Parking']
-  },
-  {
-    id: 9,
-    plotNumber: 'P009',
-    title: 'Family 2BR Duplex',
-    type: '2BR',
-    location: 'Bahati',
-    rent: 22000,
-    status: 'vacant',
-    tenant: null,
-    image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400&h=300&fit=crop',
-    lastPayment: null,
-    dateAdded: '2024-03-20',
-    features: ['Duplex Design', 'Garden', 'Parking', 'Security', 'Water included', 'WiFi']
-  },
-  {
-    id: 10,
-    plotNumber: 'P010',
-    title: 'Luxury 5BR Mansion',
-    type: '5BR',
-    location: 'Upperhill',
-    rent: 85000,
-    status: 'occupied',
-    tenant: 'Mr. & Mrs. Kariuki',
-    image: 'https://images.unsplash.com/photo-1600607687644-aac4c3eac7f4?w=400&h=300&fit=crop',
-    lastPayment: '2024-06-25',
-    dateAdded: '2024-01-01',
-    features: ['Swimming Pool', 'Garden', 'Parking', 'Security', 'Generator', 'WiFi', 'Gym', 'Sauna', 'Study Room']
-  }
-];
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Plus, Edit, Trash2, Eye, Home, Upload, Camera, Video } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 const PropertyManagement = () => {
-  const [properties, setProperties] = useState(mockProperties);
-  const [selectedProperty, setSelectedProperty] = useState(null);
-  const [showAddForm, setShowAddForm] = useState(false);
+  const { toast } = useToast();
+
+  // Form state for adding new property
   const [newProperty, setNewProperty] = useState({
     plotNumber: '',
-    plotName: '',
     title: '',
     type: '',
     location: '',
     neighborhood: '',
     rent: '',
     waterBillCost: '',
-    image: '',
-    plotImages: [],
-    plotVideos: [],
-    features: '',
-    description: ''
+    description: '',
+    features: [],
+    images: [],
+    landlordName: '',
+    landlordPhone: '',
+    paybill: '',
+    accountNumber: ''
   });
 
-  const [mediaUploadType, setMediaUploadType] = useState('image');
+  const [newFeature, setNewFeature] = useState('');
+  const [mediaType, setMediaType] = useState('image'); // 'image', 'video', 'live'
 
-  const handleAddProperty = (e: React.FormEvent) => {
+  // Mock properties data with new fields
+  const [properties, setProperties] = useState([
+    {
+      id: 1,
+      plotNumber: 'PLT001',
+      title: 'Cozy Bedsitter in Nakuru Town',
+      type: 'Bedsitter',
+      location: 'Nakuru Town',
+      neighborhood: 'Town Center',
+      rent: 8000,
+      waterBillCost: 500,
+      status: 'Occupied',
+      tenant: 'John Kamau',
+      image: 'https://images.unsplash.com/photo-1512917774080-9991f1c9c7ca',
+      lastPayment: '2024-01-15',
+      dateAdded: '2023-12-01',
+      features: ['Water included', 'Security', 'WiFi']
+    },
+    {
+      id: 2,
+      plotNumber: 'PLT002',
+      title: 'Spacious 2BR Apartment in Milimani',
+      type: '2BR',
+      location: 'Milimani',
+      neighborhood: 'Milimani Estate',
+      rent: 25000,
+      waterBillCost: 800,
+      status: 'Vacant',
+      tenant: '',
+      image: 'https://images.unsplash.com/photo-1494200426193-1c0c4efcb48f',
+      lastPayment: '',
+      dateAdded: '2023-11-15',
+      features: ['Parking', 'Security', 'Modern Kitchen', 'Balcony']
+    }
+  ]);
+
+  const propertyTypes = ["Bedsitter", "Studio", "1BR", "2BR", "3BR", "Own Compound"];
+  const locations = ["Nakuru Town", "Lanet", "Njoro", "Rongai", "Mbaruk", "Kabarak", "Bahati", "Milimani", "Westside", "Kiamunyi", "Racecourse", "Section 58"];
+  const commonFeatures = ["Water included", "Parking", "Security", "Wi-Fi Ready", "Modern Kitchen", "Garden", "Furnished", "Generator", "Balcony"];
+
+  const handleInputChange = (field: string, value: string) => {
+    setNewProperty(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const addFeature = (feature: string) => {
+    if (feature && !newProperty.features.includes(feature)) {
+      setNewProperty(prev => ({
+        ...prev,
+        features: [...prev.features, feature]
+      }));
+      setNewFeature('');
+    }
+  };
+
+  const removeFeature = (feature: string) => {
+    setNewProperty(prev => ({
+      ...prev,
+      features: prev.features.filter(f => f !== feature)
+    }));
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!newProperty.plotNumber || !newProperty.title || !newProperty.type || !newProperty.location || !newProperty.rent) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in all required fields",
+        variant: "destructive"
+      });
+      return;
+    }
+
     const property = {
       id: properties.length + 1,
-      ...newProperty,
-      rent: Number(newProperty.rent),
-      waterBillCost: Number(newProperty.waterBillCost),
-      status: 'vacant',
-      tenant: null,
-      lastPayment: null,
+      plotNumber: newProperty.plotNumber,
+      title: newProperty.title,
+      type: newProperty.type,
+      location: newProperty.location,
+      neighborhood: newProperty.neighborhood,
+      rent: parseInt(newProperty.rent),
+      waterBillCost: parseInt(newProperty.waterBillCost) || 0,
+      status: 'Vacant',
+      tenant: '',
+      image: 'https://images.unsplash.com/photo-1512917774080-9991f1c9c7ca',
+      lastPayment: '',
       dateAdded: new Date().toISOString().split('T')[0],
-      features: newProperty.features.split(',').map(f => f.trim()),
-      images: [...newProperty.plotImages],
-      available: true,
-      rating: 0,
-      reviews: 0,
-      beds: 0,
-      baths: 1
+      features: newProperty.features
     };
+
     setProperties([...properties, property]);
-    setNewProperty({ 
-      plotNumber: '', 
-      plotName: '',
-      title: '', 
-      type: '', 
-      location: '', 
-      neighborhood: '',
-      rent: '', 
-      waterBillCost: '',
-      image: '', 
-      plotImages: [],
-      plotVideos: [],
-      features: '',
-      description: ''
-    });
-    setShowAddForm(false);
-  };
-
-  const handleMediaUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    // In a real app, you would upload these files to a server
-    // For now, we'll create object URLs for preview
-    const urls = files.map(file => URL.createObjectURL(file));
     
-    if (mediaUploadType === 'image') {
-      setNewProperty(prev => ({
-        ...prev,
-        plotImages: [...prev.plotImages, ...urls]
-      }));
-    } else {
-      setNewProperty(prev => ({
-        ...prev,
-        plotVideos: [...prev.plotVideos, ...urls]
-      }));
-    }
+    // Reset form
+    setNewProperty({
+      plotNumber: '',
+      title: '',
+      type: '',
+      location: '',
+      neighborhood: '',
+      rent: '',
+      waterBillCost: '',
+      description: '',
+      features: [],
+      images: [],
+      landlordName: '',
+      landlordPhone: '',
+      paybill: '',
+      accountNumber: ''
+    });
+
+    toast({
+      title: "Property Added Successfully",
+      description: `${property.title} has been added to the listings`,
+    });
   };
 
-  const removePlotMedia = (index: number, type: 'image' | 'video') => {
-    if (type === 'image') {
-      setNewProperty(prev => ({
-        ...prev,
-        plotImages: prev.plotImages.filter((_, i) => i !== index)
-      }));
-    } else {
-      setNewProperty(prev => ({
-        ...prev,
-        plotVideos: prev.plotVideos.filter((_, i) => i !== index)
-      }));
-    }
+  const deleteProperty = (id: number) => {
+    setProperties(properties.filter(p => p.id !== id));
+    toast({
+      title: "Property Deleted",
+      description: "Property has been removed from listings",
+    });
   };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'occupied': return 'bg-green-100 text-green-800';
-      case 'vacant': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  const totalProperties = properties.length;
-  const occupiedProperties = properties.filter(p => p.status === 'occupied').length;
-  const vacantProperties = properties.filter(p => p.status === 'vacant').length;
-  const totalMonthlyRent = properties.filter(p => p.status === 'occupied').reduce((sum, p) => sum + p.rent, 0);
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h2 className="text-2xl font-bold">Property Management</h2>
-          <p className="text-gray-600">Manage your rental properties and tenants</p>
-        </div>
-        <Button onClick={() => setShowAddForm(true)} className="bg-green-600 hover:bg-green-700">
-          <Plus className="w-4 h-4 mr-2" />
-          Add Property
-        </Button>
-      </div>
+      <Tabs defaultValue="add-property" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="add-property">Add New Property</TabsTrigger>
+          <TabsTrigger value="existing-properties">Existing Properties</TabsTrigger>
+        </TabsList>
 
-      {/* Property Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Total Properties</p>
-                <p className="text-2xl font-bold text-blue-600">
-                  {totalProperties}
-                </p>
-              </div>
-              <MapPin className="w-8 h-8 text-blue-600" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Occupied</p>
-                <p className="text-2xl font-bold text-green-600">
-                  {occupiedProperties}
-                </p>
-              </div>
-              <DollarSign className="w-8 h-8 text-green-600" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Vacant</p>
-                <p className="text-2xl font-bold text-red-600">
-                  {vacantProperties}
-                </p>
-              </div>
-              <Eye className="w-8 h-8 text-red-600" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Monthly Revenue</p>
-                <p className="text-2xl font-bold text-purple-600">
-                  KSh {totalMonthlyRent.toLocaleString()}
-                </p>
-              </div>
-              <DollarSign className="w-8 h-8 text-purple-600" />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {showAddForm && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Add New Property</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleAddProperty} className="space-y-6">
-              {/* Basic Property Information */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="plotNumber">Plot Number</Label>
-                  <Input
-                    id="plotNumber"
-                    value={newProperty.plotNumber}
-                    onChange={(e) => setNewProperty(prev => ({ ...prev, plotNumber: e.target.value }))}
-                    required
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="plotName">Plot Name</Label>
-                  <Input
-                    id="plotName"
-                    value={newProperty.plotName}
-                    onChange={(e) => setNewProperty(prev => ({ ...prev, plotName: e.target.value }))}
-                    required
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="title">Property Title</Label>
-                  <Input
-                    id="title"
-                    value={newProperty.title}
-                    onChange={(e) => setNewProperty(prev => ({ ...prev, title: e.target.value }))}
-                    required
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="type">Property Type</Label>
-                  <Select onValueChange={(value) => setNewProperty(prev => ({ ...prev, type: value }))}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select property type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Bedsitter">Bedsitter</SelectItem>
-                      <SelectItem value="Studio">Studio</SelectItem>
-                      <SelectItem value="1BR">1 Bedroom</SelectItem>
-                      <SelectItem value="2BR">2 Bedroom</SelectItem>
-                      <SelectItem value="3BR">3 Bedroom</SelectItem>
-                      <SelectItem value="4BR">4 Bedroom</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label htmlFor="location">Location</Label>
-                  <Input
-                    id="location"
-                    value={newProperty.location}
-                    onChange={(e) => setNewProperty(prev => ({ ...prev, location: e.target.value }))}
-                    required
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="neighborhood">Neighborhood</Label>
-                  <Input
-                    id="neighborhood"
-                    value={newProperty.neighborhood}
-                    onChange={(e) => setNewProperty(prev => ({ ...prev, neighborhood: e.target.value }))}
-                    required
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="rent">Monthly Rent (KSh)</Label>
-                  <Input
-                    id="rent"
-                    type="number"
-                    value={newProperty.rent}
-                    onChange={(e) => setNewProperty(prev => ({ ...prev, rent: e.target.value }))}
-                    required
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="waterBillCost">Water Bill Cost (KSh)</Label>
-                  <Input
-                    id="waterBillCost"
-                    type="number"
-                    value={newProperty.waterBillCost}
-                    onChange={(e) => setNewProperty(prev => ({ ...prev, waterBillCost: e.target.value }))}
-                    required
-                  />
-                </div>
-              </div>
-
-              {/* Description */}
-              <div>
-                <Label htmlFor="description">Property Description</Label>
-                <Textarea
-                  id="description"
-                  value={newProperty.description}
-                  onChange={(e) => setNewProperty(prev => ({ ...prev, description: e.target.value }))}
-                  placeholder="Describe the property in detail..."
-                  rows={3}
-                />
-              </div>
-
-              {/* Features */}
-              <div>
-                <Label htmlFor="features">Features (comma-separated)</Label>
-                <Input
-                  id="features"
-                  value={newProperty.features}
-                  onChange={(e) => setNewProperty(prev => ({ ...prev, features: e.target.value }))}
-                  placeholder="WiFi, Parking, Security, Water included"
-                />
-              </div>
-
-              {/* Media Upload Section */}
-              <div className="space-y-4">
-                <div>
-                  <Label>Plot Media</Label>
-                  <div className="flex gap-2 mb-4">
-                    <Button
-                      type="button"
-                      variant={mediaUploadType === 'image' ? 'default' : 'outline'}
-                      onClick={() => setMediaUploadType('image')}
-                      size="sm"
-                    >
-                      <Camera className="w-4 h-4 mr-2" />
-                      Images
-                    </Button>
-                    <Button
-                      type="button"
-                      variant={mediaUploadType === 'video' ? 'default' : 'outline'}
-                      onClick={() => setMediaUploadType('video')}
-                      size="sm"
-                    >
-                      <Video className="w-4 h-4 mr-2" />
-                      Videos
-                    </Button>
-                  </div>
-                  
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-                    <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                    <p className="text-gray-600 mb-2">
-                      Upload {mediaUploadType === 'image' ? 'images' : 'videos'} of the plot
-                    </p>
+        <TabsContent value="add-property">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Home className="w-5 h-5 mr-2" />
+                Add New Property
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleSubmit} className="space-y-6">
+                {/* Basic Information */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="plotNumber">Plot Number *</Label>
                     <Input
-                      type="file"
-                      multiple
-                      accept={mediaUploadType === 'image' ? 'image/*' : 'video/*'}
-                      onChange={handleMediaUpload}
-                      className="max-w-xs"
+                      id="plotNumber"
+                      placeholder="PLT001"
+                      value={newProperty.plotNumber}
+                      onChange={(e) => handleInputChange('plotNumber', e.target.value)}
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="title">Property Title *</Label>
+                    <Input
+                      id="title"
+                      placeholder="e.g., Modern 2BR Apartment"
+                      value={newProperty.title}
+                      onChange={(e) => handleInputChange('title', e.target.value)}
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="type">Property Type *</Label>
+                    <Select onValueChange={(value) => handleInputChange('type', value)}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select property type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {propertyTypes.map(type => (
+                          <SelectItem key={type} value={type}>{type}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="location">Location *</Label>
+                    <Select onValueChange={(value) => handleInputChange('location', value)}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select location" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {locations.map(location => (
+                          <SelectItem key={location} value={location}>{location}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="neighborhood">Neighborhood</Label>
+                    <Input
+                      id="neighborhood"
+                      placeholder="e.g., Milimani Estate"
+                      value={newProperty.neighborhood}
+                      onChange={(e) => handleInputChange('neighborhood', e.target.value)}
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="rent">Monthly Rent (KSh) *</Label>
+                    <Input
+                      id="rent"
+                      type="number"
+                      placeholder="25000"
+                      value={newProperty.rent}
+                      onChange={(e) => handleInputChange('rent', e.target.value)}
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="waterBillCost">Water Bill Cost (KSh)</Label>
+                    <Input
+                      id="waterBillCost"
+                      type="number"
+                      placeholder="500"
+                      value={newProperty.waterBillCost}
+                      onChange={(e) => handleInputChange('waterBillCost', e.target.value)}
                     />
                   </div>
                 </div>
 
-                {/* Preview uploaded media */}
-                {newProperty.plotImages.length > 0 && (
+                {/* Description */}
+                <div>
+                  <Label htmlFor="description">Property Description</Label>
+                  <Textarea
+                    id="description"
+                    placeholder="Describe the property, its features, and surroundings..."
+                    value={newProperty.description}
+                    onChange={(e) => handleInputChange('description', e.target.value)}
+                    rows={4}
+                  />
+                </div>
+
+                {/* Media Upload */}
+                <div className="space-y-4">
+                  <Label>Property Media</Label>
+                  <div className="flex gap-2 mb-4">
+                    <Button
+                      type="button"
+                      variant={mediaType === 'image' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setMediaType('image')}
+                    >
+                      <Upload className="w-4 h-4 mr-2" />
+                      Upload Images
+                    </Button>
+                    <Button
+                      type="button"
+                      variant={mediaType === 'video' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setMediaType('video')}
+                    >
+                      <Video className="w-4 h-4 mr-2" />
+                      Upload Video
+                    </Button>
+                    <Button
+                      type="button"
+                      variant={mediaType === 'live' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setMediaType('live')}
+                    >
+                      <Camera className="w-4 h-4 mr-2" />
+                      Live Capture
+                    </Button>
+                  </div>
+
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                    {mediaType === 'image' && (
+                      <>
+                        <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                        <h3 className="text-lg font-medium text-gray-900 mb-2">Upload Property Images</h3>
+                        <p className="text-gray-600 mb-4">Drag and drop images or click to browse</p>
+                        <Button type="button" variant="outline">
+                          Select Images
+                        </Button>
+                      </>
+                    )}
+                    {mediaType === 'video' && (
+                      <>
+                        <Video className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                        <h3 className="text-lg font-medium text-gray-900 mb-2">Upload Property Video</h3>
+                        <p className="text-gray-600 mb-4">Upload a video tour of the property</p>
+                        <Button type="button" variant="outline">
+                          Select Video
+                        </Button>
+                      </>
+                    )}
+                    {mediaType === 'live' && (
+                      <>
+                        <Camera className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                        <h3 className="text-lg font-medium text-gray-900 mb-2">Live Camera Capture</h3>
+                        <p className="text-gray-600 mb-4">Take photos directly with your camera</p>
+                        <Button type="button" variant="outline">
+                          Open Camera
+                        </Button>
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                {/* Features */}
+                <div className="space-y-4">
+                  <Label>Features & Amenities</Label>
+                  <div className="flex flex-wrap gap-2">
+                    {newProperty.features.map(feature => (
+                      <Badge key={feature} variant="secondary" className="cursor-pointer">
+                        {feature}
+                        <button
+                          type="button"
+                          onClick={() => removeFeature(feature)}
+                          className="ml-2 text-red-500 hover:text-red-700"
+                        >
+                          ×
+                        </button>
+                      </Badge>
+                    ))}
+                  </div>
+
+                  <div className="flex flex-wrap gap-2">
+                    {commonFeatures.map(feature => (
+                      <Button
+                        key={feature}
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => addFeature(feature)}
+                        disabled={newProperty.features.includes(feature)}
+                      >
+                        <Plus className="w-4 h-4 mr-1" />
+                        {feature}
+                      </Button>
+                    ))}
+                  </div>
+
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="Add custom feature..."
+                      value={newFeature}
+                      onChange={(e) => setNewFeature(e.target.value)}
+                    />
+                    <Button
+                      type="button"
+                      onClick={() => addFeature(newFeature)}
+                      disabled={!newFeature}
+                    >
+                      Add
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Landlord Information */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label>Uploaded Images</Label>
-                    <div className="grid grid-cols-3 gap-2 mt-2">
-                      {newProperty.plotImages.map((url, index) => (
-                        <div key={index} className="relative">
-                          <img
-                            src={url}
-                            alt={`Plot ${index + 1}`}
-                            className="w-full h-20 object-cover rounded border"
-                          />
-                          <Button
-                            type="button"
-                            variant="destructive"
-                            size="sm"
-                            className="absolute top-1 right-1 w-6 h-6 p-0"
-                            onClick={() => removePlotMedia(index, 'image')}
-                          >
-                            ×
-                          </Button>
+                    <Label htmlFor="landlordName">Landlord Name</Label>
+                    <Input
+                      id="landlordName"
+                      placeholder="John Kamau"
+                      value={newProperty.landlordName}
+                      onChange={(e) => handleInputChange('landlordName', e.target.value)}
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="landlordPhone">Phone Number</Label>
+                    <Input
+                      id="landlordPhone"
+                      placeholder="+254 712 345 678"
+                      value={newProperty.landlordPhone}
+                      onChange={(e) => handleInputChange('landlordPhone', e.target.value)}
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="paybill">M-PESA Paybill Number</Label>
+                    <Input
+                      id="paybill"
+                      placeholder="522533"
+                      value={newProperty.paybill}
+                      onChange={(e) => handleInputChange('paybill', e.target.value)}
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="accountNumber">Account Number</Label>
+                    <Input
+                      id="accountNumber"
+                      placeholder="HOUSE001"
+                      value={newProperty.accountNumber}
+                      onChange={(e) => handleInputChange('accountNumber', e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                <div className="flex justify-end space-x-4">
+                  <Button type="button" variant="outline">
+                    Save as Draft
+                  </Button>
+                  <Button type="submit" className="bg-green-600 hover:bg-green-700">
+                    Add Property
+                  </Button>
+                </div>
+              </form>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="existing-properties">
+          <Card>
+            <CardHeader>
+              <CardTitle>Existing Properties ({properties.length})</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid gap-4">
+                {properties.map((property) => (
+                  <div key={property.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
+                    <div className="flex justify-between items-start">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-2">
+                          <h3 className="font-semibold">{property.title}</h3>
+                          <Badge variant={property.status === 'Occupied' ? 'default' : 'secondary'}>
+                            {property.status}
+                          </Badge>
                         </div>
-                      ))}
+                        <div className="text-sm text-gray-600 space-y-1">
+                          <p><strong>Plot:</strong> {property.plotNumber}</p>
+                          <p><strong>Location:</strong> {property.location} - {property.neighborhood}</p>
+                          <p><strong>Rent:</strong> KSh {property.rent.toLocaleString()}/month</p>
+                          <p><strong>Water Bill:</strong> KSh {property.waterBillCost ? property.waterBillCost.toLocaleString() : 0}/month</p>
+                          {property.tenant && <p><strong>Tenant:</strong> {property.tenant}</p>}
+                          <div className="flex flex-wrap gap-1 mt-2">
+                            {property.features.map(feature => (
+                              <Badge key={feature} variant="outline" className="text-xs">
+                                {feature}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button variant="outline" size="sm">
+                          <Eye className="w-4 h-4" />
+                        </Button>
+                        <Button variant="outline" size="sm">
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={() => deleteProperty(property.id)}>
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
                     </div>
                   </div>
-                )}
-
-                {newProperty.plotVideos.length > 0 && (
-                  <div>
-                    <Label>Uploaded Videos</Label>
-                    <div className="grid grid-cols-2 gap-2 mt-2">
-                      {newProperty.plotVideos.map((url, index) => (
-                        <div key={index} className="relative">
-                          <video
-                            src={url}
-                            className="w-full h-20 object-cover rounded border"
-                            controls
-                          />
-                          <Button
-                            type="button"
-                            variant="destructive"
-                            size="sm"
-                            className="absolute top-1 right-1 w-6 h-6 p-0"
-                            onClick={() => removePlotMedia(index, 'video')}
-                          >
-                            ×
-                          </Button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
+                ))}
               </div>
-
-              <div className="flex gap-2">
-                <Button type="submit" className="bg-green-600 hover:bg-green-700">
-                  Add Property
-                </Button>
-                <Button type="button" variant="outline" onClick={() => setShowAddForm(false)}>
-                  Cancel
-                </Button>
-              </div>
-            </form>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Properties Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Properties Overview</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Plot #</TableHead>
-                <TableHead>Property</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Location</TableHead>
-                <TableHead>Neighborhood</TableHead>
-                <TableHead>Rent</TableHead>
-                <TableHead>Water Bill</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Tenant</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {properties.map((property) => (
-                <TableRow key={property.id}>
-                  <TableCell className="font-medium">{property.plotNumber}</TableCell>
-                  <TableCell>
-                    <div className="flex items-center space-x-3">
-                      {property.image && (
-                        <img
-                          src={property.image}
-                          alt={property.title}
-                          className="w-12 h-12 rounded-lg object-cover"
-                        />
-                      )}
-                      <span>{property.title}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell>{property.type}</TableCell>
-                  <TableCell>
-                    <div className="flex items-center">
-                      <MapPin className="w-4 h-4 mr-1 text-gray-400" />
-                      {property.location}
-                    </div>
-                  </TableCell>
-                  <TableCell>{property.neighborhood || 'N/A'}</TableCell>
-                  <TableCell>
-                    <div className="flex items-center">
-                      <DollarSign className="w-4 h-4 mr-1 text-gray-400" />
-                      KSh {property.rent.toLocaleString()}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center">
-                      <DollarSign className="w-4 h-4 mr-1 text-gray-400" />
-                      KSh {property.waterBillCost ? property.waterBillCost.toLocaleString() : 'N/A'}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge className={getStatusColor(property.status)}>
-                      {property.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>{property.tenant || 'N/A'}</TableCell>
-                  <TableCell>
-                    <div className="flex space-x-2">
-                      <Button size="sm" variant="outline">
-                        <Eye className="w-4 h-4" />
-                      </Button>
-                      <Button size="sm" variant="outline">
-                        <Edit className="w-4 h-4" />
-                      </Button>
-                      <Button size="sm" variant="outline" className="text-red-600">
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

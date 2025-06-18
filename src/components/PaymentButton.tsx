@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { CreditCard, Smartphone } from 'lucide-react';
+import { CreditCard, Smartphone, Droplets } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -14,6 +14,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
 
 interface PaymentButtonProps {
@@ -37,9 +38,16 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
     cvv: '',
     name: ''
   });
+  const [payRent, setPayRent] = useState(true);
+  const [payWater, setPayWater] = useState(false);
   const { toast } = useToast();
 
-  const totalAmount = rent + waterBill;
+  const calculateTotal = () => {
+    let total = 0;
+    if (payRent) total += rent;
+    if (payWater && waterBill) total += waterBill;
+    return total;
+  };
 
   const handleMpesaPayment = () => {
     if (!mpesaNumber) {
@@ -51,10 +59,23 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
       return;
     }
 
-    // Simulate M-Pesa payment
+    const total = calculateTotal();
+    if (total === 0) {
+      toast({
+        title: "Select payment items",
+        description: "Please select at least one item to pay for",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const paymentItems = [];
+    if (payRent) paymentItems.push('Rent');
+    if (payWater) paymentItems.push('Water Bill');
+
     toast({
       title: "M-Pesa Payment Initiated",
-      description: `Payment request of KSh ${totalAmount.toLocaleString()} sent to ${mpesaNumber}. Check your phone for STK push.`,
+      description: `Payment request of KSh ${total.toLocaleString()} for ${paymentItems.join(' and ')} sent to ${mpesaNumber}. Check your phone for STK push.`,
     });
   };
 
@@ -68,10 +89,23 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
       return;
     }
 
-    // Simulate card payment
+    const total = calculateTotal();
+    if (total === 0) {
+      toast({
+        title: "Select payment items",
+        description: "Please select at least one item to pay for",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const paymentItems = [];
+    if (payRent) paymentItems.push('Rent');
+    if (payWater) paymentItems.push('Water Bill');
+
     toast({
       title: "Payment Successful",
-      description: `Payment of KSh ${totalAmount.toLocaleString()} processed successfully for ${propertyTitle}`,
+      description: `Payment of KSh ${total.toLocaleString()} for ${paymentItems.join(' and ')} processed successfully for ${propertyTitle}`,
     });
   };
 
@@ -80,38 +114,56 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
       <DialogTrigger asChild>
         <Button className="w-full bg-green-600 hover:bg-green-700 text-white">
           <CreditCard className="w-4 h-4 mr-2" />
-          Pay Now - KSh {totalAmount.toLocaleString()}
+          Pay Now - KSh {rent.toLocaleString()}
+          {waterBill > 0 && ` + KSh ${waterBill.toLocaleString()}`}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Payment for {propertyTitle}</DialogTitle>
           <DialogDescription>
-            Choose your preferred payment method to proceed
+            Choose what to pay and your preferred payment method
           </DialogDescription>
         </DialogHeader>
         
         <div className="space-y-4">
-          {/* Payment Summary */}
+          {/* Payment Items Selection */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Payment Summary</CardTitle>
+              <CardTitle className="text-lg">Select Payment Items</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-2">
-              <div className="flex justify-between">
-                <span>Monthly Rent:</span>
-                <span>KSh {rent.toLocaleString()}</span>
+            <CardContent className="space-y-3">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="rent"
+                  checked={payRent}
+                  onCheckedChange={(checked) => setPayRent(checked as boolean)}
+                />
+                <Label htmlFor="rent" className="flex-1 cursor-pointer">
+                  Monthly Rent
+                </Label>
+                <span className="font-medium">KSh {rent.toLocaleString()}</span>
               </div>
+              
               {waterBill > 0 && (
-                <div className="flex justify-between">
-                  <span>Water Bill:</span>
-                  <span>KSh {waterBill.toLocaleString()}</span>
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="water"
+                    checked={payWater}
+                    onCheckedChange={(checked) => setPayWater(checked as boolean)}
+                  />
+                  <Label htmlFor="water" className="flex-1 cursor-pointer flex items-center">
+                    <Droplets className="w-4 h-4 mr-2 text-blue-500" />
+                    Water Bill
+                  </Label>
+                  <span className="font-medium">KSh {waterBill.toLocaleString()}</span>
                 </div>
               )}
+              
               <Separator />
-              <div className="flex justify-between font-bold">
+              <div className="flex justify-between font-bold text-lg">
                 <span>Total Amount:</span>
-                <span>KSh {totalAmount.toLocaleString()}</span>
+                <span className="text-green-600">KSh {calculateTotal().toLocaleString()}</span>
               </div>
             </CardContent>
           </Card>
@@ -152,8 +204,9 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
               <Button 
                 onClick={handleMpesaPayment}
                 className="w-full bg-green-600 hover:bg-green-700"
+                disabled={calculateTotal() === 0}
               >
-                Pay with M-Pesa
+                Pay KSh {calculateTotal().toLocaleString()} with M-Pesa
               </Button>
             </div>
           )}
@@ -202,8 +255,9 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
               <Button 
                 onClick={handleCardPayment}
                 className="w-full bg-blue-600 hover:bg-blue-700"
+                disabled={calculateTotal() === 0}
               >
-                Pay with Card
+                Pay KSh {calculateTotal().toLocaleString()} with Card
               </Button>
             </div>
           )}

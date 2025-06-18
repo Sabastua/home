@@ -14,7 +14,10 @@ const mockProperties = [
     id: 1,
     title: 'Cozy Bedsitter in Nakuru Town',
     location: 'Nakuru Town',
+    neighborhood: 'Town Center',
+    plotNumber: 'PLT001',
     rent: 8000,
+    waterBillCost: 500,
     image: 'https://images.unsplash.com/photo-1512917774080-9991f1c9c7ca?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cHJvcGVydHl8ZW58MHx8MHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60',
     images: [
       'https://images.unsplash.com/photo-1512917774080-9991f1c9c7ca?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cHJvcGVydHl8ZW58MHx8MHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60',
@@ -32,7 +35,10 @@ const mockProperties = [
     id: 2,
     title: 'Spacious 2BR Apartment in Milimani',
     location: 'Milimani',
+    neighborhood: 'Milimani Estate',
+    plotNumber: 'PLT002',
     rent: 25000,
+    waterBillCost: 800,
     image: 'https://images.unsplash.com/photo-1494200426193-1c0c4efcb48f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fEFwYXJ0bWVudHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60',
     images: [
       'https://images.unsplash.com/photo-1494200426193-1c0c4efcb48f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
@@ -50,7 +56,10 @@ const mockProperties = [
     id: 3,
     title: 'Modern Studio Apartment in Westside',
     location: 'Westside',
+    neighborhood: 'Westside Gardens',
+    plotNumber: 'PLT003',
     rent: 12000,
+    waterBillCost: 400,
     image: 'https://images.unsplash.com/photo-1600585154524-164726a3a7fa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTZ8fEFwYXJ0bWVudHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60',
     images: [
       'https://images.unsplash.com/photo-1600585154524-164726a3a7fa?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
@@ -68,7 +77,10 @@ const mockProperties = [
     id: 4,
     title: 'Elegant 3BR House in Kiamunyi',
     location: 'Kiamunyi',
+    neighborhood: 'Kiamunyi Hills',
+    plotNumber: 'PLT004',
     rent: 40000,
+    waterBillCost: 1200,
     image: 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8SG91c2V8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=800&q=60',
     images: [
       'https://images.unsplash.com/photo-1568605114967-8130f3a36994?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
@@ -86,7 +98,10 @@ const mockProperties = [
     id: 5,
     title: 'Stylish 1BR Apartment in Racecourse',
     location: 'Racecourse',
+    neighborhood: 'Racecourse Estate',
+    plotNumber: 'PLT005',
     rent: 18000,
+    waterBillCost: 600,
     image: 'https://images.unsplash.com/photo-1520215790490-49023c19ca80?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTd8fEFwYXJ0bWVudHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60',
     images: [
       'https://images.unsplash.com/photo-1520215790490-49023c19ca80?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
@@ -104,7 +119,10 @@ const mockProperties = [
     id: 6,
     title: 'Bedsitter with a View in Section 58',
     location: 'Section 58',
+    neighborhood: 'Section 58',
+    plotNumber: 'PLT006',
     rent: 9000,
+    waterBillCost: 300,
     image: 'https://images.unsplash.com/photo-1592595539828-49624c13e6e3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjB8fEFwYXJ0bWVudHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60',
     images: [
       'https://images.unsplash.com/photo-1592595539828-49624c13e6e3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
@@ -122,7 +140,10 @@ const mockProperties = [
     id: 7,
     title: 'Lovely 2 Bedroom House in Naka Estate',
     location: 'Naka Estate',
+    neighborhood: 'Naka Estate',
+    plotNumber: 'PLT007',
     rent: 28000,
+    waterBillCost: 1000,
     image: 'https://images.unsplash.com/photo-1570129477492-45c003dc7ddb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTh8fEhvdXNlfGVufDB8fDB8fHww&auto=format&fit=crop&w=800&q=60',
     images: [
       'https://images.unsplash.com/photo-1570129477492-45c003dc7ddb?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
@@ -140,7 +161,10 @@ const mockProperties = [
     id: 8,
     title: 'Affordable Studio in Free Area',
     location: 'Free Area',
+    neighborhood: 'Free Area',
+    plotNumber: 'PLT008',
     rent: 11000,
+    waterBillCost: 500,
     image: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mjl8fEFwYXJ0bWVudHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60',
     images: [
       'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
@@ -158,7 +182,10 @@ const mockProperties = [
     id: 9,
     title: '3 Bedroom Bungalow in London Estate',
     location: 'London Estate',
+    neighborhood: 'London Estate',
+    plotNumber: 'PLT009',
     rent: 35000,
+    waterBillCost: 1500,
     image: 'https://images.unsplash.com/photo-1613490495763-54ed944c48ee?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MzJ8fEhvdXNlfGVufDB8fDB8fHww&auto=format&fit=crop&w=800&q=60',
     images: [
       'https://images.unsplash.com/photo-1613490495763-54ed944c48ee?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
@@ -176,7 +203,10 @@ const mockProperties = [
     id: 10,
     title: 'Well-Lit 1 Bedroom in White House',
     location: 'White House',
+    neighborhood: 'White House',
+    plotNumber: 'PLT010',
     rent: 17000,
+    waterBillCost: 1000,
     image: 'https://images.unsplash.com/photo-1560185893-a55cbc97b59c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MzZ8fEFwYXJ0bWVudHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60',
     images: [
       'https://images.unsplash.com/photo-1560185893-a55cbc97b59c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
@@ -266,7 +296,7 @@ const Index = () => {
             <div className="flex items-center space-x-4">
               <Link to="/favorites" className="relative">
                 <Button variant="ghost" size="sm" className="relative">
-                  <Heart className="w-5 h-5" />
+                  <Star className="w-5 h-5" />
                   {favorites.length > 0 && (
                     <Badge 
                       variant="destructive" 
@@ -335,8 +365,8 @@ const Index = () => {
                   onClick={() => toggleFavorite(property.id)}
                   className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm hover:bg-white shadow-lg"
                 >
-                  <Heart 
-                    className={`w-5 h-5 ${favorites.includes(property.id) ? 'fill-red-500 text-red-500' : 'text-gray-600'}`} 
+                  <Star 
+                    className={`w-5 h-5 ${favorites.includes(property.id) ? 'fill-yellow-500 text-yellow-500' : 'text-gray-600'}`} 
                   />
                 </Button>
                 <Badge className="absolute top-4 left-4 bg-green-600 text-white">
