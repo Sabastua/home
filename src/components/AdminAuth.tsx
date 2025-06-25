@@ -1,10 +1,8 @@
-
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Lock, User } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { supabase } from '@/lib/supabaseClient';
 
 interface AdminAuthProps {
   onLogin: () => void;
@@ -12,18 +10,23 @@ interface AdminAuthProps {
 
 const AdminAuth = ({ onLogin }: AdminAuthProps) => {
   const [credentials, setCredentials] = useState({
-    username: '',
+    email: '',
     password: ''
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Simple authentication check - in a real app, this would validate against a backend
-    if (credentials.username === 'admin' && credentials.password === 'admin123') {
-      localStorage.setItem('adminAuthenticated', 'true');
-      onLogin();
+    setLoading(true);
+    setError(null);
+    const { email, password } = credentials;
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    setLoading(false);
+    if (error) {
+      setError(error.message);
     } else {
-      alert('Invalid credentials. Use admin/admin123');
+      onLogin();
     }
   };
 
@@ -35,52 +38,28 @@ const AdminAuth = ({ onLogin }: AdminAuthProps) => {
             <span className="text-white font-bold text-xl">NH</span>
           </div>
           <CardTitle className="text-2xl">Admin Login</CardTitle>
-          <p className="text-gray-600">Enter your credentials to access the admin panel</p>
+          <p className="text-gray-600">Enter your admin email and password</p>
         </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <Label htmlFor="username">Username</Label>
-              <div className="relative">
-                <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                <Input
-                  id="username"
-                  type="text"
-                  placeholder="Enter username"
-                  className="pl-10"
-                  value={credentials.username}
-                  onChange={(e) => setCredentials(prev => ({ ...prev, username: e.target.value }))}
-                  required
-                />
-              </div>
-            </div>
-            <div>
-              <Label htmlFor="password">Password</Label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="Enter password"
-                  className="pl-10"
-                  value={credentials.password}
-                  onChange={(e) => setCredentials(prev => ({ ...prev, password: e.target.value }))}
-                  required
-                />
-              </div>
-            </div>
-            <Button type="submit" className="w-full bg-green-600 hover:bg-green-700">
-              Login
-            </Button>
-          </form>
-          <div className="mt-4 p-3 bg-blue-50 rounded-lg">
-            <p className="text-sm text-blue-800">
-              <strong>Demo credentials:</strong><br />
-              Username: admin<br />
-              Password: admin123
-            </p>
-          </div>
-        </CardContent>
+        <form className="p-6 space-y-4" onSubmit={handleSubmit}>
+          <Input
+            type="email"
+            placeholder="Admin Email"
+            value={credentials.email}
+            onChange={e => setCredentials({ ...credentials, email: e.target.value })}
+            required
+          />
+          <Input
+            type="password"
+            placeholder="Password"
+            value={credentials.password}
+            onChange={e => setCredentials({ ...credentials, password: e.target.value })}
+            required
+          />
+          {error && <div className="text-red-600 text-sm text-center">{error}</div>}
+          <Button type="submit" className="w-full bg-green-600 hover:bg-green-700" disabled={loading}>
+            {loading ? 'Logging in...' : 'Login'}
+          </Button>
+        </form>
       </Card>
     </div>
   );

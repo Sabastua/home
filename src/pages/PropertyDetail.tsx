@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { MapPin, Calendar, Check, ArrowLeft, Phone, Mail, Home, Wifi, Car, Shield, Building2, MessageCircle, Eye, Heart, User, DollarSign } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import PaymentModal from '@/components/PaymentModal';
+import { getCurrentUserId, fetchFavorites, addFavorite, removeFavorite } from '@/lib/favorites';
 
 // Enhanced property data with comprehensive information for all 10 properties
 const propertyData = {
@@ -420,9 +421,23 @@ const PropertyDetail = () => {
     paymentType: 'rent' as 'rent' | 'water' | 'deposit',
     amount: 0
   });
+  const [userId, setUserId] = useState<string | null>(null);
+  const [isFavorite, setIsFavorite] = useState(false);
   
   const propertyId = parseInt(id || '1', 10);
   const property = propertyData[propertyId as keyof typeof propertyData];
+
+  useEffect(() => {
+    async function fetchUserAndFavorite() {
+      const id = await getCurrentUserId();
+      setUserId(id);
+      if (id) {
+        const favs = await fetchFavorites(id);
+        setIsFavorite(favs.includes(propertyId));
+      }
+    }
+    fetchUserAndFavorite();
+  }, [propertyId]);
 
   const handleContactAgent = () => {
     window.open(`tel:${property.agent.phone}`, '_self');
@@ -453,6 +468,17 @@ const PropertyDetail = () => {
       paymentType: 'rent',
       amount: 0
     });
+  };
+
+  const handleToggleFavorite = async () => {
+    if (!userId) return;
+    if (isFavorite) {
+      await removeFavorite(userId, propertyId);
+      setIsFavorite(false);
+    } else {
+      await addFavorite(userId, propertyId);
+      setIsFavorite(true);
+    }
   };
 
   if (!property) {
@@ -762,12 +788,10 @@ const PropertyDetail = () => {
                     Schedule Viewing
                   </Button>
                 </Link>
-                <Link to={`/favorites`} className="block">
-                  <Button variant="outline" className="w-full rounded-2xl py-3 border-2 hover:bg-gray-50">
-                    <Heart className="w-4 h-4 mr-2" />
-                    Save to Favorites
-                  </Button>
-                </Link>
+                <Button variant={isFavorite ? 'destructive' : 'outline'} className="w-full rounded-2xl py-3 border-2 hover:bg-gray-50" onClick={handleToggleFavorite}>
+                  <Heart className="w-4 h-4 mr-2" />
+                  {isFavorite ? 'Remove from Favorites' : 'Save to Favorites'}
+                </Button>
               </CardContent>
             </Card>
           </div>

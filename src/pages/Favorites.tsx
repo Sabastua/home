@@ -4,27 +4,43 @@ import { ArrowLeft, Heart, MapPin, ChevronRight, Star, Trash2 } from 'lucide-rea
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { mockProperties } from './Index';
 import PaymentButton from '@/components/PaymentButton';
+import { fetchFavorites, removeFavorite, getCurrentUserId } from '@/lib/favorites';
+import { supabase } from '@/lib/supabaseClient';
 
 const Favorites = () => {
-  const [favorites, setFavorites] = useState<number[]>([]);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [properties, setProperties] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const storedFavorites = localStorage.getItem('favorites');
-    if (storedFavorites) {
-      setFavorites(JSON.parse(storedFavorites));
+    async function getUserAndFavorites() {
+      setLoading(true);
+      const id = await getCurrentUserId();
+      setUserId(id);
+      if (id) {
+        const favIds = await fetchFavorites(id);
+        if (favIds.length > 0) {
+          // Fetch property details for these IDs
+          const { data, error } = await supabase
+            .from('properties')
+            .select('*')
+            .in('id', favIds);
+          setProperties(data || []);
+        } else {
+          setProperties([]);
+        }
+      }
+      setLoading(false);
     }
+    getUserAndFavorites();
   }, []);
 
-  const removeFavorite = (id: number) => {
-    const updatedFavorites = favorites.filter(favId => favId !== id);
-    setFavorites(updatedFavorites);
-    localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
+  const removeFavoriteHandler = async (propertyId: number) => {
+    if (!userId) return;
+    await removeFavorite(userId, propertyId);
+    setProperties(properties.filter(p => p.id !== propertyId));
   };
-
-  // Get the favorited property objects
-  const favoritedProperties = mockProperties.filter(property => favorites.includes(property.id));
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -42,7 +58,7 @@ const Favorites = () => {
               </div>
               <div className="hidden sm:block">
                 <h1 className="text-lg font-semibold text-gray-900">My Favorites</h1>
-                <p className="text-xs text-gray-500">{favoritedProperties.length} saved properties</p>
+                <p className="text-xs text-gray-500">{properties.length} saved properties</p>
               </div>
             </div>
           </div>
@@ -59,7 +75,9 @@ const Favorites = () => {
           <p className="text-gray-600">Properties you've saved for later</p>
         </div>
 
-        {favoritedProperties.length === 0 ? (
+        {loading ? (
+          <div className="text-center py-16">Loading favorites...</div>
+        ) : properties.length === 0 ? (
           <div className="text-center py-16">
             <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <Heart className="w-12 h-12 text-gray-400" />
@@ -74,7 +92,7 @@ const Favorites = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {favoritedProperties.map(property => {
+            {properties.map(property => {
               const waterBillCost = typeof property['waterBillCost'] === 'number' ? property['waterBillCost'] : 0;
               return (
                 <Card key={property.id} className="overflow-hidden hover:shadow-xl transition-all duration-300 rounded-3xl border-0 bg-white shadow-sm hover:scale-[1.02]">
@@ -89,7 +107,7 @@ const Favorites = () => {
                         {property.type}
                       </Badge>
                       <Button
-                        onClick={() => removeFavorite(property.id)}
+                        onClick={() => removeFavoriteHandler(property.id)}
                         className="absolute top-3 left-3 w-10 h-10 rounded-full bg-red-500/90 hover:bg-red-600 text-white p-0 shadow-lg backdrop-blur-sm"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -151,7 +169,7 @@ const Favorites = () => {
             })}
           </div>
         )}
-        {favoritedProperties.length > 0 && (
+        {properties.length > 0 && (
           <div className="mt-12 text-center">
             <Link to="/">
               <Button variant="outline" className="rounded-2xl px-8 py-3 border-2">

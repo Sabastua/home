@@ -8,225 +8,17 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import MobileSwipeView from '@/components/MobileSwipeView';
 import PaymentButton from '@/components/PaymentButton';
-
-export const mockProperties = [
-  {
-    id: 1,
-    title: 'Cozy Bedsitter in Nakuru Town',
-    location: 'Nakuru Town',
-    neighborhood: 'Town Center',
-    plotNumber: 'PLT001',
-    rent: 8000,
-    waterBillCost: 500,
-    image: '/property1.jpg',
-    images: [
-      'https://images.unsplash.com/photo-1512917774080-9991f1c9c7ca?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cHJvcGVydHl8ZW58MHx8MHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60',
-      'https://images.unsplash.com/photo-1494200426193-1c0c4efcb48f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60'
-    ],
-    type: 'Bedsitter',
-    rating: 4.5,
-    beds: 0,
-    baths: 1,
-    features: ['Water included', 'Security', 'WiFi'],
-    available: true,
-    reviews: 12,
-  },
-  {
-    id: 2,
-    title: 'Spacious 2BR Apartment in Milimani',
-    location: 'Milimani',
-    neighborhood: 'Milimani Estate',
-    plotNumber: 'PLT002',
-    rent: 25000,
-    waterBillCost: 800,
-    image: '/property2.jpg',
-    images: [
-      'https://images.unsplash.com/photo-1494200426193-1c0c4efcb48f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
-      'https://images.unsplash.com/photo-1560185893-a55cbc97b59c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60'
-    ],
-    type: '2BR',
-    rating: 4.2,
-    beds: 2,
-    baths: 1,
-    features: ['Parking', 'Security', 'Modern Kitchen', 'Balcony'],
-    available: true,
-    reviews: 18,
-  },
-  {
-    id: 3,
-    title: 'Modern Studio Apartment in Westside',
-    location: 'Westside',
-    neighborhood: 'Westside Gardens',
-    plotNumber: 'PLT003',
-    rent: 12000,
-    waterBillCost: 400,
-    image: '/property3.jpg',
-    images: [
-      'https://images.unsplash.com/photo-1600585154524-164726a3a7fa?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
-      'https://images.unsplash.com/photo-1518005020951-eccb494ad742?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60'
-    ],
-    type: 'Studio',
-    rating: 4.8,
-    beds: 0,
-    baths: 1,
-    features: ['Modern', 'Security', 'Water included'],
-    available: true,
-    reviews: 25,
-  },
-  {
-    id: 4,
-    title: 'Elegant 3BR House in Kiamunyi',
-    location: 'Kiamunyi',
-    neighborhood: 'Kiamunyi Hills',
-    plotNumber: 'PLT004',
-    rent: 40000,
-    waterBillCost: 1200,
-    image: '/property4.jpg',
-    images: [
-      'https://images.unsplash.com/photo-1568605114967-8130f3a36994?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
-      'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60'
-    ],
-    type: '3BR',
-    rating: 4.6,
-    beds: 3,
-    baths: 2,
-    features: ['Garden', 'Parking', 'Security', 'Generator'],
-    available: true,
-    reviews: 22,
-  },
-  {
-    id: 5,
-    title: 'Stylish 1BR Apartment in Racecourse',
-    location: 'Racecourse',
-    neighborhood: 'Racecourse Estate',
-    plotNumber: 'PLT005',
-    rent: 18000,
-    waterBillCost: 600,
-    image: '/property5.jpg',
-    images: [
-      'https://images.unsplash.com/photo-1520215790490-49023c19ca80?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
-      'https://images.unsplash.com/photo-1512917774080-9991f1c9c7ca?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60'
-    ],
-    type: '1BR',
-    rating: 4.3,
-    beds: 1,
-    baths: 1,
-    features: ['Parking', 'Security', 'Water included', 'WiFi'],
-    available: true,
-    reviews: 15,
-  },
-  {
-    id: 6,
-    title: 'Bedsitter with a View in Section 58',
-    location: 'Section 58',
-    neighborhood: 'Section 58',
-    plotNumber: 'PLT006',
-    rent: 9000,
-    waterBillCost: 300,
-    image: '/property1.jpg',
-    images: [
-      'https://images.unsplash.com/photo-1592595539828-49624c13e6e3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
-      'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60'
-    ],
-    type: 'Bedsitter',
-    rating: 4.1,
-    beds: 0,
-    baths: 1,
-    features: ['Garden View', 'Security', 'Water included'],
-    available: true,
-    reviews: 8,
-  },
-  {
-    id: 7,
-    title: 'Lovely 2 Bedroom House in Naka Estate',
-    location: 'Naka Estate',
-    neighborhood: 'Naka Estate',
-    plotNumber: 'PLT007',
-    rent: 28000,
-    waterBillCost: 1000,
-    image: '/property2.jpg',
-    images: [
-      'https://images.unsplash.com/photo-1570129477492-45c003dc7ddb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTh8fEhvdXNlfGVufDB8fDB8fHww&auto=format&fit=crop&w=800&q=60',
-      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60'
-    ],
-    type: '2BR',
-    rating: 4.7,
-    beds: 2,
-    baths: 1,
-    features: ['Garden', 'Parking', 'Security', 'WiFi'],
-    available: true,
-    reviews: 30,
-  },
-  {
-    id: 8,
-    title: 'Affordable Studio in Free Area',
-    location: 'Free Area',
-    neighborhood: 'Free Area',
-    plotNumber: 'PLT008',
-    rent: 11000,
-    waterBillCost: 500,
-    image: '/property3.jpg',
-    images: [
-      'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mjl8fEFwYXJ0bWVudHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60',
-      'https://images.unsplash.com/photo-1649972904349-6e44c42644a7?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60'
-    ],
-    type: 'Studio',
-    rating: 4.0,
-    beds: 0,
-    baths: 1,
-    features: ['Water included', 'Security', 'Parking'],
-    available: true,
-    reviews: 12,
-  },
-  {
-    id: 9,
-    title: '3 Bedroom Bungalow in London Estate',
-    location: 'London Estate',
-    neighborhood: 'London Estate',
-    plotNumber: 'PLT009',
-    rent: 35000,
-    waterBillCost: 1500,
-    image: '/property4.jpg',
-    images: [
-      'https://images.unsplash.com/photo-1613490495763-54ed944c48ee?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MzJ8fEhvdXNlfGVufDB8fDB8fHww&auto=format&fit=crop&w=800&q=60',
-      'https://images.unsplash.com/photo-1487958449943-2429e8be8625?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60'
-    ],
-    type: '3BR',
-    rating: 4.4,
-    beds: 3,
-    baths: 2,
-    features: ['Own Compound', 'Garden', 'Parking', 'Security'],
-    available: true,
-    reviews: 18,
-  },
-  {
-    id: 10,
-    title: 'Well-Lit 1 Bedroom in White House',
-    location: 'White House',
-    neighborhood: 'White House',
-    plotNumber: 'PLT010',
-    rent: 17000,
-    waterBillCost: 1000,
-    image: '/property10.jpg',
-    images: [
-      'https://images.unsplash.com/photo-1560185893-a55cbc97b59c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MzZ8fEFwYXJ0bWVudHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60',
-      'https://images.unsplash.com/photo-1493809842364-78817add7ffb?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60'
-    ],
-    type: '1BR',
-    rating: 4.9,
-    beds: 1,
-    baths: 1,
-    features: ['Modern Kitchen', 'Parking', 'Security', 'WiFi'],
-    available: true,
-    reviews: 35,
-  },
-];
+import { supabase } from '@/lib/supabaseClient';
+import { fetchFavorites, addFavorite, removeFavorite, getCurrentUserId } from '@/lib/favorites';
 
 const Index = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [favorites, setFavorites] = useState<number[]>([]);
   const [isMobile, setIsMobile] = useState(false);
   const { toast } = useToast();
+  const [properties, setProperties] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
     const handleResize = () => {
@@ -240,32 +32,53 @@ const Index = () => {
   }, []);
 
   useEffect(() => {
-    const storedFavorites = localStorage.getItem('favorites');
-    if (storedFavorites) {
-      setFavorites(JSON.parse(storedFavorites));
+    async function getUserAndFavorites() {
+      const id = await getCurrentUserId();
+      setUserId(id);
+      if (id) {
+        const favs = await fetchFavorites(id);
+        setFavorites(favs);
+      }
     }
+    getUserAndFavorites();
   }, []);
 
-  const filteredProperties = mockProperties.filter(property =>
+  useEffect(() => {
+    async function fetchProperties() {
+      setLoading(true);
+      const { data, error } = await supabase.from('properties').select('*');
+      if (!error) setProperties(data);
+      setLoading(false);
+    }
+    fetchProperties();
+  }, []);
+
+  const filteredProperties = properties.filter(property =>
     property.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     property.location.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const toggleFavorite = (propertyId: number) => {
-    const updatedFavorites = favorites.includes(propertyId)
-      ? favorites.filter(id => id !== propertyId)
-      : [...favorites, propertyId];
-    
+  const toggleFavorite = async (propertyId: number) => {
+    if (!userId) {
+      toast({ title: 'Please log in to save favorites.' });
+      return;
+    }
+    let updatedFavorites;
+    if (favorites.includes(propertyId)) {
+      await removeFavorite(userId, propertyId);
+      updatedFavorites = favorites.filter(id => id !== propertyId);
+      toast({ title: 'Removed from favorites', description: 'Property removed from your favorites list' });
+    } else {
+      await addFavorite(userId, propertyId);
+      updatedFavorites = [...favorites, propertyId];
+      toast({ title: 'Added to favorites', description: 'Property added to your favorites list' });
+    }
     setFavorites(updatedFavorites);
-    localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
-    
-    toast({
-      title: favorites.includes(propertyId) ? "Removed from favorites" : "Added to favorites",
-      description: favorites.includes(propertyId) 
-        ? "Property removed from your favorites list"
-        : "Property added to your favorites list",
-    });
   };
+
+  if (loading) {
+    return <div className="flex justify-center items-center min-h-screen">Loading properties...</div>;
+  }
 
   if (isMobile) {
     return (

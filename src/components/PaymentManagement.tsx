@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,183 +6,23 @@ import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Search, Filter, Download, DollarSign, Calendar, User, MapPin } from 'lucide-react';
-
-// Enhanced mock payment data for all 10 properties
-const mockPayments = [
-  {
-    id: 1,
-    plotNumber: 'P001',
-    tenantName: 'John Kamau',
-    propertyTitle: 'Modern 2BR Apartment',
-    amount: 25000,
-    type: 'rent',
-    status: 'paid',
-    dueDate: '2024-06-30',
-    paidDate: '2024-06-28',
-    mpesaCode: 'QAR5TXN123'
-  },
-  {
-    id: 2,
-    plotNumber: 'P001',
-    tenantName: 'John Kamau',
-    propertyTitle: 'Modern 2BR Apartment',
-    amount: 2500,
-    type: 'water',
-    status: 'paid',
-    dueDate: '2024-06-30',
-    paidDate: '2024-06-29',
-    mpesaCode: 'QBR6TXN456'
-  },
-  {
-    id: 3,
-    plotNumber: 'P003',
-    tenantName: 'Mary Wanjiku',
-    propertyTitle: 'Spacious 3BR House',
-    amount: 35000,
-    type: 'rent',
-    status: 'overdue',
-    dueDate: '2024-06-30',
-    paidDate: null,
-    mpesaCode: null
-  },
-  {
-    id: 4,
-    plotNumber: 'P004',
-    tenantName: 'Peter Mwangi',
-    propertyTitle: 'Studio Apartment',
-    amount: 12000,
-    type: 'rent',
-    status: 'pending',
-    dueDate: '2024-07-05',
-    paidDate: null,
-    mpesaCode: null
-  },
-  {
-    id: 5,
-    plotNumber: 'P005',
-    tenantName: 'Dr. James Mwangi',
-    propertyTitle: 'Executive 4BR Villa',
-    amount: 55000,
-    type: 'rent',
-    status: 'paid',
-    dueDate: '2024-06-30',
-    paidDate: '2024-06-20',
-    mpesaCode: 'QCR7TXN789'
-  },
-  {
-    id: 6,
-    plotNumber: 'P005',
-    tenantName: 'Dr. James Mwangi',
-    propertyTitle: 'Executive 4BR Villa',
-    amount: 5000,
-    type: 'water',
-    status: 'paid',
-    dueDate: '2024-06-30',
-    paidDate: '2024-06-22',
-    mpesaCode: 'QDR8TXN012'
-  },
-  {
-    id: 7,
-    plotNumber: 'P007',
-    tenantName: 'Sarah Njoki',
-    propertyTitle: 'Modern 3BR Penthouse',
-    amount: 42000,
-    type: 'rent',
-    status: 'paid',
-    dueDate: '2024-06-30',
-    paidDate: '2024-06-12',
-    mpesaCode: 'QER9TXN345'
-  },
-  {
-    id: 8,
-    plotNumber: 'P008',
-    tenantName: 'Grace Wangui',
-    propertyTitle: 'Affordable Bedsitter',
-    amount: 6500,
-    type: 'rent',
-    status: 'paid',
-    dueDate: '2024-06-30',
-    paidDate: '2024-06-08',
-    mpesaCode: 'QFS0TXN678'
-  },
-  {
-    id: 9,
-    plotNumber: 'P010',
-    tenantName: 'Mr. & Mrs. Kariuki',
-    propertyTitle: 'Luxury 5BR Mansion',
-    amount: 85000,
-    type: 'rent',
-    status: 'paid',
-    dueDate: '2024-06-30',
-    paidDate: '2024-06-25',
-    mpesaCode: 'QGT1TXN901'
-  },
-  {
-    id: 10,
-    plotNumber: 'P010',
-    tenantName: 'Mr. & Mrs. Kariuki',
-    propertyTitle: 'Luxury 5BR Mansion',
-    amount: 8000,
-    type: 'water',
-    status: 'paid',
-    dueDate: '2024-06-30',
-    paidDate: '2024-06-26',
-    mpesaCode: 'QHU2TXN234'
-  },
-  {
-    id: 11,
-    plotNumber: 'P003',
-    tenantName: 'Mary Wanjiku',
-    propertyTitle: 'Spacious 3BR House',
-    amount: 3000,
-    type: 'water',
-    status: 'overdue',
-    dueDate: '2024-06-30',
-    paidDate: null,
-    mpesaCode: null
-  },
-  {
-    id: 12,
-    plotNumber: 'P004',
-    tenantName: 'Peter Mwangi',
-    propertyTitle: 'Studio Apartment',
-    amount: 1500,
-    type: 'water',
-    status: 'pending',
-    dueDate: '2024-07-05',
-    paidDate: null,
-    mpesaCode: null
-  },
-  {
-    id: 13,
-    plotNumber: 'P007',
-    tenantName: 'Sarah Njoki',
-    propertyTitle: 'Modern 3BR Penthouse',
-    amount: 4000,
-    type: 'water',
-    status: 'paid',
-    dueDate: '2024-06-30',
-    paidDate: '2024-06-15',
-    mpesaCode: 'QIV3TXN567'
-  },
-  {
-    id: 14,
-    plotNumber: 'P008',
-    tenantName: 'Grace Wangui',
-    propertyTitle: 'Affordable Bedsitter',
-    amount: 800,
-    type: 'water',
-    status: 'paid',
-    dueDate: '2024-06-30',
-    paidDate: '2024-06-10',
-    mpesaCode: 'QJW4TXN890'
-  }
-];
+import { supabase } from '@/lib/supabaseClient';
 
 const PaymentManagement = () => {
-  const [payments, setPayments] = useState(mockPayments);
+  const [payments, setPayments] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+
+  useEffect(() => {
+    async function fetchPayments() {
+      setLoading(true);
+      const { data, error } = await supabase.from('payments').select('*');
+      if (!error) setPayments(data);
+      setLoading(false);
+    }
+    fetchPayments();
+  }, []);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -214,6 +53,18 @@ const PaymentManagement = () => {
   const pendingAmount = payments.filter(p => p.status === 'pending').reduce((sum, p) => sum + p.amount, 0);
   const overdueAmount = payments.filter(p => p.status === 'overdue').reduce((sum, p) => sum + p.amount, 0);
   const totalPayments = payments.length;
+
+  async function addPayment(payment) {
+    const { data, error } = await supabase.from('payments').insert([payment]);
+    if (!error) {
+      const { data: updated, error: fetchError } = await supabase.from('payments').select('*');
+      if (!fetchError) setPayments(updated);
+    }
+  }
+
+  if (loading) {
+    return <div className="flex justify-center items-center min-h-screen">Loading payments...</div>;
+  }
 
   return (
     <div className="space-y-6">

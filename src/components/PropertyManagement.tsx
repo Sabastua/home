@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Plus, Edit, Trash2, Eye, Home, Upload, Camera, Video } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/lib/supabaseClient';
 
 const PropertyManagement = () => {
   const { toast } = useToast();
@@ -35,41 +35,19 @@ const PropertyManagement = () => {
   const [newFeature, setNewFeature] = useState('');
   const [mediaType, setMediaType] = useState('image'); // 'image', 'video', 'live'
 
-  // Mock properties data with new fields
-  const [properties, setProperties] = useState([
-    {
-      id: 1,
-      plotNumber: 'PLT001',
-      title: 'Cozy Bedsitter in Nakuru Town',
-      type: 'Bedsitter',
-      location: 'Nakuru Town',
-      neighborhood: 'Town Center',
-      rent: 8000,
-      waterBillCost: 500,
-      status: 'Occupied',
-      tenant: 'John Kamau',
-      image: 'https://images.unsplash.com/photo-1512917774080-9991f1c9c7ca',
-      lastPayment: '2024-01-15',
-      dateAdded: '2023-12-01',
-      features: ['Water included', 'Security', 'WiFi']
-    },
-    {
-      id: 2,
-      plotNumber: 'PLT002',
-      title: 'Spacious 2BR Apartment in Milimani',
-      type: '2BR',
-      location: 'Milimani',
-      neighborhood: 'Milimani Estate',
-      rent: 25000,
-      waterBillCost: 800,
-      status: 'Vacant',
-      tenant: '',
-      image: 'https://images.unsplash.com/photo-1494200426193-1c0c4efcb48f',
-      lastPayment: '',
-      dateAdded: '2023-11-15',
-      features: ['Parking', 'Security', 'Modern Kitchen', 'Balcony']
+  // Remove mock properties data
+  const [properties, setProperties] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchProperties() {
+      setLoading(true);
+      const { data, error } = await supabase.from('properties').select('*');
+      if (!error) setProperties(data);
+      setLoading(false);
     }
-  ]);
+    fetchProperties();
+  }, []);
 
   const propertyTypes = ["Bedsitter", "Studio", "1BR", "2BR", "3BR", "Own Compound"];
   const locations = ["Nakuru Town", "Lanet", "Njoro", "Rongai", "Mbaruk", "Kabarak", "Bahati", "Milimani", "Westside", "Kiamunyi", "Racecourse", "Section 58"];
@@ -99,9 +77,8 @@ const PropertyManagement = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
     if (!newProperty.plotNumber || !newProperty.title || !newProperty.type || !newProperty.location || !newProperty.rent) {
       toast({
         title: "Missing Information",
@@ -110,9 +87,7 @@ const PropertyManagement = () => {
       });
       return;
     }
-
     const property = {
-      id: properties.length + 1,
       plotNumber: newProperty.plotNumber,
       title: newProperty.title,
       type: newProperty.type,
@@ -127,40 +102,47 @@ const PropertyManagement = () => {
       dateAdded: new Date().toISOString().split('T')[0],
       features: newProperty.features
     };
-
-    setProperties([...properties, property]);
-    
-    // Reset form
-    setNewProperty({
-      plotNumber: '',
-      title: '',
-      type: '',
-      location: '',
-      neighborhood: '',
-      rent: '',
-      waterBillCost: '',
-      description: '',
-      features: [],
-      images: [],
-      landlordName: '',
-      landlordPhone: '',
-      paybill: '',
-      accountNumber: ''
-    });
-
-    toast({
-      title: "Property Added Successfully",
-      description: `${property.title} has been added to the listings`,
-    });
+    const { data, error } = await supabase.from('properties').insert([property]);
+    if (!error) {
+      setNewProperty({
+        plotNumber: '', title: '', type: '', location: '', neighborhood: '', rent: '', waterBillCost: '', description: '', features: [], images: [], landlordName: '', landlordPhone: '', paybill: '', accountNumber: ''
+      });
+      toast({
+        title: "Property Added Successfully",
+        description: `${property.title} has been added to the listings`,
+      });
+      // Refetch properties
+      const { data: updated, error: fetchError } = await supabase.from('properties').select('*');
+      if (!fetchError) setProperties(updated);
+    } else {
+      toast({
+        title: "Error Adding Property",
+        description: error.message,
+        variant: "destructive"
+      });
+    }
   };
 
-  const deleteProperty = (id: number) => {
-    setProperties(properties.filter(p => p.id !== id));
-    toast({
-      title: "Property Deleted",
-      description: "Property has been removed from listings",
-    });
+  const deleteProperty = async (id) => {
+    const { error } = await supabase.from('properties').delete().eq('id', id);
+    if (!error) {
+      setProperties(properties.filter(p => p.id !== id));
+      toast({
+        title: "Property Deleted",
+        description: "Property has been removed from listings",
+      });
+    } else {
+      toast({
+        title: "Error Deleting Property",
+        description: error.message,
+        variant: "destructive"
+      });
+    }
   };
+
+  if (loading) {
+    return <div className="flex justify-center items-center min-h-screen">Loading properties...</div>;
+  }
 
   return (
     <div className="space-y-6">

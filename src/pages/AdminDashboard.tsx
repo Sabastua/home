@@ -59,6 +59,7 @@ const AdminDashboard = () => {
 
   const [monthlyData, setMonthlyData] = useState([]);
   const [properties, setProperties] = useState([]);
+  const [payments, setPayments] = useState([]);
 
   function downloadReceipt(receipt) {
     const doc = new jsPDF();
@@ -75,10 +76,11 @@ const AdminDashboard = () => {
   }
 
   useEffect(() => {
-    const adminAuth = localStorage.getItem('adminAuthenticated');
-    if (adminAuth === 'true') {
-      setIsAuthenticated(true);
+    async function checkSession() {
+      const { data } = await supabase.auth.getSession();
+      setIsAuthenticated(!!data.session);
     }
+    checkSession();
   }, []);
 
   useEffect(() => {
@@ -107,12 +109,20 @@ const AdminDashboard = () => {
     fetchProperties();
   }, []);
 
+  useEffect(() => {
+    async function fetchPayments() {
+      const { data, error } = await supabase.from('payments').select('*');
+      if (!error) setPayments(data);
+    }
+    fetchPayments();
+  }, []);
+
   const handleLogin = () => {
     setIsAuthenticated(true);
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('adminAuthenticated');
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
     setIsAuthenticated(false);
   };
 
@@ -144,29 +154,54 @@ const AdminDashboard = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Property listing submitted:', formData);
-    alert('Property listed successfully!');
-  };
-
-  async function addProperty(newProperty) {
+    // Prepare property data
+    const newProperty = {
+      title: formData.title,
+      type: formData.type,
+      location: formData.location,
+      rent: Number(formData.rent),
+      description: formData.description,
+      features: formData.features,
+      landlord_name: formData.landlordName,
+      landlord_phone: formData.landlordPhone,
+      paybill: formData.paybill,
+      account_number: formData.accountNumber,
+      created_at: new Date().toISOString(),
+    };
     const { data, error } = await supabase.from('properties').insert([newProperty]);
     if (!error) {
-      // Optionally refetch properties or update state
+      setFormData({
+        title: '', type: '', location: '', rent: '', description: '', features: [], landlordName: '', landlordPhone: '', paybill: '', accountNumber: ''
+      });
+      alert('Property listed successfully!');
+      // Optionally refetch properties
+      const { data: updated, error: fetchError } = await supabase.from('properties').select('*');
+      if (!fetchError) setProperties(updated);
+    } else {
+      alert('Error listing property: ' + error.message);
     }
-  }
+  };
 
   async function addFavorite(userId, propertyId) {
-    const { data, error } = await supabase.from('favorites').insert([{ user_id: userId, property_id: propertyId }]);
-    if (!error) {
-      // Optionally refetch favorites or update state
-    }
+    await supabase.from('favorites').insert([{ user_id: userId, property_id: propertyId }]);
   }
 
   async function fetchFavorites(userId) {
     const { data } = await supabase.from('favorites').select('property_id').eq('user_id', userId);
     return data.map(favorite => favorite.property_id);
+  }
+
+  const user = supabase.auth.getUser();
+
+  async function addPayment(payment) {
+    const { data, error } = await supabase.from('payments').insert([payment]);
+    // handle result
+  }
+
+  async function addReceipt(paymentId, pdfUrl) {
+    await supabase.from('receipts').insert([{ payment_id: paymentId, pdf_url: pdfUrl }]);
   }
 
   return (
