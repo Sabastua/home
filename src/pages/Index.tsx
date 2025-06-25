@@ -9,7 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import MobileSwipeView from '@/components/MobileSwipeView';
 import PaymentButton from '@/components/PaymentButton';
 
-const mockProperties = [
+export const mockProperties = [
   {
     id: 1,
     title: 'Cozy Bedsitter in Nakuru Town',
@@ -18,7 +18,7 @@ const mockProperties = [
     plotNumber: 'PLT001',
     rent: 8000,
     waterBillCost: 500,
-    image: 'https://images.unsplash.com/photo-1512917774080-9991f1c9c7ca?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cHJvcGVydHl8ZW58MHx8MHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60',
+    image: '/property1.jpg',
     images: [
       'https://images.unsplash.com/photo-1512917774080-9991f1c9c7ca?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cHJvcGVydHl8ZW58MHx8MHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60',
       'https://images.unsplash.com/photo-1494200426193-1c0c4efcb48f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60'
@@ -39,7 +39,7 @@ const mockProperties = [
     plotNumber: 'PLT002',
     rent: 25000,
     waterBillCost: 800,
-    image: 'https://images.unsplash.com/photo-1494200426193-1c0c4efcb48f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fEFwYXJ0bWVudHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60',
+    image: '/property2.jpg',
     images: [
       'https://images.unsplash.com/photo-1494200426193-1c0c4efcb48f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
       'https://images.unsplash.com/photo-1560185893-a55cbc97b59c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60'
@@ -60,7 +60,7 @@ const mockProperties = [
     plotNumber: 'PLT003',
     rent: 12000,
     waterBillCost: 400,
-    image: 'https://images.unsplash.com/photo-1600585154524-164726a3a7fa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTZ8fEFwYXJ0bWVudHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60',
+    image: '/property3.jpg',
     images: [
       'https://images.unsplash.com/photo-1600585154524-164726a3a7fa?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
       'https://images.unsplash.com/photo-1518005020951-eccb494ad742?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60'
@@ -81,7 +81,7 @@ const mockProperties = [
     plotNumber: 'PLT004',
     rent: 40000,
     waterBillCost: 1200,
-    image: 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8SG91c2V8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=800&q=60',
+    image: '/property4.jpg',
     images: [
       'https://images.unsplash.com/photo-1568605114967-8130f3a36994?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
       'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60'
@@ -102,7 +102,7 @@ const mockProperties = [
     plotNumber: 'PLT005',
     rent: 18000,
     waterBillCost: 600,
-    image: 'https://images.unsplash.com/photo-1520215790490-49023c19ca80?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTd8fEFwYXJ0bWVudHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60',
+    image: '/property5.jpg',
     images: [
       'https://images.unsplash.com/photo-1520215790490-49023c19ca80?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
       'https://images.unsplash.com/photo-1512917774080-9991f1c9c7ca?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60'
@@ -123,7 +123,7 @@ const mockProperties = [
     plotNumber: 'PLT006',
     rent: 9000,
     waterBillCost: 300,
-    image: 'https://images.unsplash.com/photo-1592595539828-49624c13e6e3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjB8fEFwYXJ0bWVudHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60',
+    image: '/property1.jpg',
     images: [
       'https://images.unsplash.com/photo-1592595539828-49624c13e6e3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
       'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60'
@@ -144,9 +144,9 @@ const mockProperties = [
     plotNumber: 'PLT007',
     rent: 28000,
     waterBillCost: 1000,
-    image: 'https://images.unsplash.com/photo-1570129477492-45c003dc7ddb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTh8fEhvdXNlfGVufDB8fDB8fHww&auto=format&fit=crop&w=800&q=60',
+    image: '/property2.jpg',
     images: [
-      'https://images.unsplash.com/photo-1570129477492-45c003dc7ddb?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
+      'https://images.unsplash.com/photo-1570129477492-45c003dc7ddb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTh8fEhvdXNlfGVufDB8fDB8fHww&auto=format&fit=crop&w=800&q=60',
       'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60'
     ],
     type: '2BR',
@@ -165,9 +165,9 @@ const mockProperties = [
     plotNumber: 'PLT008',
     rent: 11000,
     waterBillCost: 500,
-    image: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mjl8fEFwYXJ0bWVudHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60',
+    image: '/property3.jpg',
     images: [
-      'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
+      'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mjl8fEFwYXJ0bWVudHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60',
       'https://images.unsplash.com/photo-1649972904349-6e44c42644a7?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60'
     ],
     type: 'Studio',
@@ -186,9 +186,9 @@ const mockProperties = [
     plotNumber: 'PLT009',
     rent: 35000,
     waterBillCost: 1500,
-    image: 'https://images.unsplash.com/photo-1613490495763-54ed944c48ee?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MzJ8fEhvdXNlfGVufDB8fDB8fHww&auto=format&fit=crop&w=800&q=60',
+    image: '/property4.jpg',
     images: [
-      'https://images.unsplash.com/photo-1613490495763-54ed944c48ee?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
+      'https://images.unsplash.com/photo-1613490495763-54ed944c48ee?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MzJ8fEhvdXNlfGVufDB8fDB8fHww&auto=format&fit=crop&w=800&q=60',
       'https://images.unsplash.com/photo-1487958449943-2429e8be8625?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60'
     ],
     type: '3BR',
@@ -207,9 +207,9 @@ const mockProperties = [
     plotNumber: 'PLT010',
     rent: 17000,
     waterBillCost: 1000,
-    image: 'https://images.unsplash.com/photo-1560185893-a55cbc97b59c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MzZ8fEFwYXJ0bWVudHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60',
+    image: '/property10.jpg',
     images: [
-      'https://images.unsplash.com/photo-1560185893-a55cbc97b59c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
+      'https://images.unsplash.com/photo-1560185893-a55cbc97b59c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MzZ8fEFwYXJ0bWVudHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60',
       'https://images.unsplash.com/photo-1493809842364-78817add7ffb?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60'
     ],
     type: '1BR',
@@ -350,72 +350,88 @@ const Index = () => {
           </h3>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredProperties.map((property) => (
-            <Card key={property.id} className="group hover:shadow-xl transition-all duration-300 border-0 rounded-3xl overflow-hidden bg-white">
-              <div className="relative">
-                <img 
-                  src={property.image} 
-                  alt={property.title}
-                  className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
-                />
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => toggleFavorite(property.id)}
-                  className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm hover:bg-white shadow-lg"
-                >
-                  <Star 
-                    className={`w-5 h-5 ${favorites.includes(property.id) ? 'fill-yellow-500 text-yellow-500' : 'text-gray-600'}`} 
-                  />
-                </Button>
-                <Badge className="absolute top-4 left-4 bg-green-600 text-white">
-                  {property.type}
-                </Badge>
-              </div>
-              
-              <CardContent className="p-6">
-                <div className="flex justify-between items-start mb-3">
-                  <h4 className="font-bold text-lg text-gray-900 group-hover:text-green-600 transition-colors">
-                    {property.title}
-                  </h4>
-                  <div className="text-right">
-                    <p className="text-2xl font-bold text-green-600">
-                      KSh {property.rent.toLocaleString()}
-                    </p>
-                    <p className="text-sm text-gray-500">per month</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-center text-gray-600 mb-4">
-                  <MapPin className="w-4 h-4 mr-2" />
-                  <span className="text-sm">{property.location}</span>
-                </div>
-                
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center">
-                    <Star className="w-4 h-4 text-yellow-500 mr-1" />
-                    <span className="text-sm font-medium">{property.rating}</span>
-                  </div>
-                  <span className="text-sm text-gray-500">{property.beds} bed • {property.baths} bath</span>
-                </div>
-                
-                <div className="space-y-2">
-                  <Link to={`/property/${property.id}`}>
-                    <Button variant="outline" className="w-full rounded-2xl font-semibold">
-                      View Details
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredProperties.map(property => {
+            const isFavorite = favorites.includes(property.id);
+            // Color mapping for property types
+            const typeColorMap = {
+              'Bedsitter': 'hover:border-blue-500',
+              '1BR': 'hover:border-green-500',
+              '2BR': 'hover:border-purple-500',
+              '3BR': 'hover:border-orange-500',
+              'Studio': 'hover:border-pink-500',
+            };
+            const borderColor = typeColorMap[property.type] || 'hover:border-gray-500';
+            const cardClass = `transition-transform duration-300 transform hover:scale-105 hover:shadow-xl border-2 border-transparent ${borderColor}`;
+
+            return (
+              <Card key={property.id} className={cardClass}>
+                <CardContent className="p-0">
+                  <div className="relative">
+                    <img 
+                      src={property.image} 
+                      alt={property.title}
+                      className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => toggleFavorite(property.id)}
+                      className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm hover:bg-white shadow-lg"
+                    >
+                      <Star 
+                        className={`w-5 h-5 ${favorites.includes(property.id) ? 'fill-yellow-500 text-yellow-500' : 'text-gray-600'}`} 
+                      />
                     </Button>
-                  </Link>
-                  <PaymentButton
-                    propertyId={property.id}
-                    propertyTitle={property.title}
-                    rent={property.rent}
-                    waterBill={property.waterBillCost}
-                  />
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                    <Badge className="absolute top-4 left-4 bg-green-600 text-white">
+                      {property.type}
+                    </Badge>
+                  </div>
+                  
+                  <CardContent className="p-6">
+                    <div className="flex justify-between items-start mb-3">
+                      <h4 className="font-bold text-lg text-gray-900 group-hover:text-green-600 transition-colors">
+                        {property.title}
+                      </h4>
+                      <div className="text-right">
+                        <p className="text-2xl font-bold text-green-600">
+                          KSh {property.rent.toLocaleString()}
+                        </p>
+                        <p className="text-sm text-gray-500">per month</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center text-gray-600 mb-4">
+                      <MapPin className="w-4 h-4 mr-2" />
+                      <span className="text-sm">{property.location}</span>
+                    </div>
+                    
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center">
+                        <Star className="w-4 h-4 text-yellow-500 mr-1" />
+                        <span className="text-sm font-medium">{property.rating}</span>
+                      </div>
+                      <span className="text-sm text-gray-500">{property.beds} bed • {property.baths} bath</span>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Link to={`/property/${property.id}`}>
+                        <Button variant="outline" className="w-full rounded-2xl font-semibold">
+                          View Details
+                        </Button>
+                      </Link>
+                      <PaymentButton
+                        propertyId={property.id}
+                        propertyTitle={property.title}
+                        rent={property.rent}
+                        waterBill={property.waterBillCost}
+                      />
+                    </div>
+                  </CardContent>
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
 
         {filteredProperties.length === 0 && (

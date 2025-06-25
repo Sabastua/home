@@ -13,6 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AdminAuth from '@/components/AdminAuth';
 import PropertyManagement from '@/components/PropertyManagement';
 import PaymentManagement from '@/components/PaymentManagement';
+import jsPDF from 'jspdf';
 
 const AdminDashboard = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -34,6 +35,39 @@ const AdminDashboard = () => {
   const propertyTypes = ["Bedsitter", "Studio", "1BR", "2BR", "3BR", "Own Compound"];
   const locations = ["Nakuru Town", "Lanet", "Njoro", "Rongai", "Mbaruk", "Kabarak", "Bahati"];
   const commonFeatures = ["Water included", "Parking", "Security", "Wi-Fi Ready", "Modern Kitchen", "Garden", "Furnished"];
+
+  const tenantReceipts = [
+    {
+      tenantName: 'Jane Doe',
+      amountPaid: 35000,
+      waterBill: 2000,
+      rent: 30000,
+      deposit: 3000,
+      datePaid: '2024-07-01',
+    },
+    {
+      tenantName: 'John Smith',
+      amountPaid: 40000,
+      waterBill: 2500,
+      rent: 35000,
+      deposit: 2500,
+      datePaid: '2024-07-02',
+    },
+  ];
+
+  function downloadReceipt(receipt) {
+    const doc = new jsPDF();
+    doc.setFontSize(16);
+    doc.text('Tenant Payment Receipt', 20, 20);
+    doc.setFontSize(12);
+    doc.text(`Tenant Name: ${receipt.tenantName}`, 20, 40);
+    doc.text(`Amount Paid: KSh ${receipt.amountPaid.toLocaleString()}`, 20, 50);
+    doc.text(`Water Bill: KSh ${receipt.waterBill.toLocaleString()}`, 20, 60);
+    doc.text(`Rent: KSh ${receipt.rent.toLocaleString()}`, 20, 70);
+    doc.text(`Deposit: KSh ${receipt.deposit.toLocaleString()}`, 20, 80);
+    doc.text(`Date Paid: ${receipt.datePaid}`, 20, 90);
+    doc.save(`receipt-${receipt.tenantName.replace(/\s+/g, '_')}-${receipt.datePaid}.pdf`);
+  }
 
   useEffect(() => {
     const adminAuth = localStorage.getItem('adminAuthenticated');
@@ -114,6 +148,46 @@ const AdminDashboard = () => {
       </header>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle>Tenant Payment Receipts</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead>
+                  <tr>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Tenant</th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Amount Paid</th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Water Bill</th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Rent</th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Deposit</th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Date Paid</th>
+                    <th className="px-4 py-2"></th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {tenantReceipts.map((receipt, idx) => (
+                    <tr key={idx}>
+                      <td className="px-4 py-2 whitespace-nowrap">{receipt.tenantName}</td>
+                      <td className="px-4 py-2 whitespace-nowrap">KSh {receipt.amountPaid.toLocaleString()}</td>
+                      <td className="px-4 py-2 whitespace-nowrap">KSh {receipt.waterBill.toLocaleString()}</td>
+                      <td className="px-4 py-2 whitespace-nowrap">KSh {receipt.rent.toLocaleString()}</td>
+                      <td className="px-4 py-2 whitespace-nowrap">KSh {receipt.deposit.toLocaleString()}</td>
+                      <td className="px-4 py-2 whitespace-nowrap">{receipt.datePaid}</td>
+                      <td className="px-4 py-2 whitespace-nowrap">
+                        <Button size="sm" variant="outline" onClick={() => downloadReceipt(receipt)}>
+                          Download PDF
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
+
         <Tabs defaultValue="add-property" className="space-y-6">
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="add-property">Add Property</TabsTrigger>
