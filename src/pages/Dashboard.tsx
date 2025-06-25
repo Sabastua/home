@@ -8,30 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, ResponsiveContainer } from 'recharts';
 import AdminAuth from '@/components/AdminAuth';
-
-// Mock data for admin analytics
-const monthlyRevenue = [
-  { month: 'Jan', rent: 250000, water: 45000, total: 295000 },
-  { month: 'Feb', rent: 275000, water: 52000, total: 327000 },
-  { month: 'Mar', rent: 300000, water: 48000, total: 348000 },
-  { month: 'Apr', rent: 325000, water: 55000, total: 380000 },
-  { month: 'May', rent: 350000, water: 58000, total: 408000 },
-  { month: 'Jun', rent: 375000, water: 62000, total: 437000 },
-];
-
-const propertyOccupancy = [
-  { type: 'Bedsitter', occupied: 45, vacant: 5 },
-  { type: '1BR', occupied: 30, vacant: 8 },
-  { type: '2BR', occupied: 25, vacant: 3 },
-  { type: '3BR', occupied: 15, vacant: 2 },
-];
-
-const revenueBreakdown = [
-  { name: 'Rent', value: 375000, color: '#10b981' },
-  { name: 'Water Bills', value: 62000, color: '#3b82f6' },
-  { name: 'Deposits', value: 25000, color: '#f59e0b' },
-  { name: 'Late Fees', value: 8000, color: '#ef4444' },
-];
+import { supabase } from '@/lib/supabaseClient';
 
 const chartConfig = {
   rent: { label: 'Rent', color: '#10b981' },
@@ -39,18 +16,18 @@ const chartConfig = {
   total: { label: 'Total', color: '#6366f1' },
 };
 
-// Mock admin data
-const adminData = {
-  totalProperties: 133,
-  totalTenants: 128,
-  monthlyRevenue: 437000,
-  occupancyRate: 89,
-  pendingPayments: 15,
-  maintenanceRequests: 7
-};
-
 const Dashboard = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [totalProperties, setTotalProperties] = useState(0);
+  const [totalTenants, setTotalTenants] = useState(0);
+  const [monthlyRevenue, setMonthlyRevenue] = useState(0);
+  const [occupancyRate, setOccupancyRate] = useState(0);
+  const [pendingPayments, setPendingPayments] = useState(0);
+  const [maintenanceRequests, setMaintenanceRequests] = useState(0);
+  const [revenueTrends, setRevenueTrends] = useState<any[]>([]);
+  const [occupancyData, setOccupancyData] = useState<any[]>([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -58,6 +35,62 @@ const Dashboard = () => {
     if (adminAuth === 'true') {
       setIsAuthenticated(true);
     }
+  }, []);
+
+  useEffect(() => {
+    async function fetchStats() {
+      setLoading(true);
+      setError(null);
+      try {
+        // Total properties
+        const { count: propertyCount } = await supabase.from('properties').select('*', { count: 'exact', head: true });
+        setTotalProperties(propertyCount || 0);
+        // Total tenants (users with a property assigned)
+        const { data: tenantProps } = await supabase.from('properties').select('tenant_id').not('tenant_id', 'is', null);
+        const uniqueTenants = new Set((tenantProps || []).map(p => p.tenant_id));
+        setTotalTenants(uniqueTenants.size);
+        // Monthly revenue (sum of payments in current month)
+        const now = new Date();
+        const monthStr = now.toISOString().slice(0, 7); // 'YYYY-MM'
+        const { data: monthPayments } = await supabase.from('payments').select('amount, date').like('date', `${monthStr}%`);
+        const monthRev = (monthPayments || []).reduce((sum, p) => sum + (p.amount || 0), 0);
+        setMonthlyRevenue(monthRev);
+        // Occupancy rate
+        const { data: allProps } = await supabase.from('properties').select('id, tenant_id, type');
+        const occupied = (allProps || []).filter(p => p.tenant_id).length;
+        const total = (allProps || []).length;
+        setOccupancyRate(total > 0 ? Math.round((occupied / total) * 100) : 0);
+        // Pending payments
+        const { data: pending } = await supabase.from('payments').select('id').eq('status', 'pending');
+        setPendingPayments((pending || []).length);
+        // Maintenance requests (if you have a table, else set to 0)
+        setMaintenanceRequests(0);
+        // Revenue trends (group by month)
+        const { data: allPayments } = await supabase.from('payments').select('amount, date, type');
+        const trendsMap = new Map();
+        (allPayments || []).forEach(p => {
+          const month = p.date ? p.date.slice(0, 7) : 'Unknown';
+          if (!trendsMap.has(month)) trendsMap.set(month, { month, rent: 0, water: 0, total: 0 });
+          if (p.type === 'rent') trendsMap.get(month).rent += p.amount || 0;
+          if (p.type === 'water') trendsMap.get(month).water += p.amount || 0;
+          trendsMap.get(month).total += p.amount || 0;
+        });
+        setRevenueTrends(Array.from(trendsMap.values()).sort((a, b) => a.month.localeCompare(b.month)));
+        // Occupancy by type
+        const typeMap = new Map();
+        (allProps || []).forEach(p => {
+          const type = p.type || 'Unknown';
+          if (!typeMap.has(type)) typeMap.set(type, { type, occupied: 0, vacant: 0 });
+          if (p.tenant_id) typeMap.get(type).occupied += 1;
+          else typeMap.get(type).vacant += 1;
+        });
+        setOccupancyData(Array.from(typeMap.values()));
+      } catch (e) {
+        setError('Error fetching dashboard data.');
+      }
+      setLoading(false);
+    }
+    fetchStats();
   }, []);
 
   const handleLogin = () => {
@@ -73,6 +106,20 @@ const Dashboard = () => {
   if (!isAuthenticated) {
     return <AdminAuth onLogin={handleLogin} />;
   }
+
+  if (loading) {
+    return <div className="flex justify-center items-center min-h-screen">Loading dashboard...</div>;
+  }
+
+  if (error) {
+    return <div className="flex justify-center items-center min-h-screen text-red-600">{error}</div>;
+  }
+
+  const revenueBreakdown = [
+    { name: 'Rent', value: (revenueTrends.reduce((sum, m) => sum + (m.rent || 0), 0)), color: '#10b981' },
+    { name: 'Water Bills', value: (revenueTrends.reduce((sum, m) => sum + (m.water || 0), 0)), color: '#3b82f6' },
+    { name: 'Other', value: (revenueTrends.reduce((sum, m) => sum + (m.total || 0), 0) - revenueTrends.reduce((sum, m) => sum + (m.rent || 0) + (m.water || 0), 0)), color: '#f59e0b' },
+  ];
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -126,7 +173,7 @@ const Dashboard = () => {
                     <div>
                       <p className="text-sm font-medium text-gray-600">Total Properties</p>
                       <p className="text-2xl font-bold text-green-600">
-                        {adminData.totalProperties}
+                        {totalProperties}
                       </p>
                     </div>
                     <Building className="w-8 h-8 text-green-600" />
@@ -140,7 +187,7 @@ const Dashboard = () => {
                     <div>
                       <p className="text-sm font-medium text-gray-600">Total Tenants</p>
                       <p className="text-2xl font-bold text-blue-600">
-                        {adminData.totalTenants}
+                        {totalTenants}
                       </p>
                     </div>
                     <Users className="w-8 h-8 text-blue-600" />
@@ -154,7 +201,7 @@ const Dashboard = () => {
                     <div>
                       <p className="text-sm font-medium text-gray-600">Monthly Revenue</p>
                       <p className="text-2xl font-bold text-purple-600">
-                        KSh {adminData.monthlyRevenue.toLocaleString()}
+                        KSh {monthlyRevenue.toLocaleString()}
                       </p>
                     </div>
                     <DollarSign className="w-8 h-8 text-purple-600" />
@@ -168,7 +215,7 @@ const Dashboard = () => {
                     <div>
                       <p className="text-sm font-medium text-gray-600">Occupancy Rate</p>
                       <p className="text-2xl font-bold text-green-600">
-                        {adminData.occupancyRate}%
+                        {occupancyRate}%
                       </p>
                     </div>
                     <Home className="w-8 h-8 text-green-600" />
@@ -185,7 +232,7 @@ const Dashboard = () => {
                 </CardHeader>
                 <CardContent>
                   <ChartContainer config={chartConfig} className="h-[300px]">
-                    <LineChart data={monthlyRevenue}>
+                    <LineChart data={revenueTrends}>
                       <XAxis dataKey="month" />
                       <YAxis />
                       <ChartTooltip content={<ChartTooltipContent />} />
@@ -199,16 +246,16 @@ const Dashboard = () => {
 
               <Card>
                 <CardHeader>
-                  <CardTitle>Property Occupancy</CardTitle>
+                  <CardTitle>Occupancy by Property Type</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <ChartContainer config={chartConfig} className="h-[300px]">
-                    <BarChart data={propertyOccupancy}>
+                    <BarChart data={occupancyData}>
                       <XAxis dataKey="type" />
                       <YAxis />
                       <ChartTooltip content={<ChartTooltipContent />} />
-                      <Bar dataKey="occupied" fill="#10b981" />
-                      <Bar dataKey="vacant" fill="#ef4444" />
+                      <Bar dataKey="occupied" fill="#10b981" name="Occupied" />
+                      <Bar dataKey="vacant" fill="#ef4444" name="Vacant" />
                     </BarChart>
                   </ChartContainer>
                 </CardContent>
@@ -267,7 +314,7 @@ const Dashboard = () => {
                 </CardHeader>
                 <CardContent>
                   <ChartContainer config={chartConfig} className="h-[300px]">
-                    <BarChart data={monthlyRevenue}>
+                    <BarChart data={revenueTrends}>
                       <XAxis dataKey="month" />
                       <YAxis />
                       <ChartTooltip content={<ChartTooltipContent />} />

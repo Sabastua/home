@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
-import { LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, ResponsiveContainer } from 'recharts';
+import { LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, ResponsiveContainer, Tooltip as RechartsTooltip } from 'recharts';
 import PaymentModal from '@/components/PaymentModal';
 import { supabase } from '@/lib/supabaseClient';
 
@@ -84,6 +84,25 @@ const TenantPortal = () => {
   const totalPaid = payments.reduce((sum, p) => sum + (p.amount || 0), 0);
   const avgMonthlyExpense = payments.length > 0 ? Math.round(totalPaid / payments.length) : 0;
   const onTimePayments = payments.length > 0 ? Math.round((payments.filter(p => p.status === 'Paid').length / payments.length) * 100) : 0;
+
+  // Prepare analytics data
+  const monthlyTrends = (() => {
+    // Group payments by month
+    const map = new Map();
+    payments.forEach(p => {
+      const month = p.date ? p.date.slice(0, 7) : 'Unknown';
+      if (!map.has(month)) map.set(month, { month, rent: 0, water: 0, total: 0 });
+      if (p.type === 'rent') map.get(month).rent += p.amount || 0;
+      if (p.type === 'water') map.get(month).water += p.amount || 0;
+      map.get(month).total += p.amount || 0;
+    });
+    return Array.from(map.values()).sort((a, b) => a.month.localeCompare(b.month));
+  })();
+  const expenseBreakdown = [
+    { name: 'Rent', value: payments.filter(p => p.type === 'rent').reduce((sum, p) => sum + (p.amount || 0), 0), color: '#10b981' },
+    { name: 'Water', value: payments.filter(p => p.type === 'water').reduce((sum, p) => sum + (p.amount || 0), 0), color: '#3b82f6' },
+    { name: 'Other', value: payments.filter(p => p.type !== 'rent' && p.type !== 'water').reduce((sum, p) => sum + (p.amount || 0), 0), color: '#f59e0b' },
+  ];
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -270,7 +289,84 @@ const TenantPortal = () => {
             </Card>
           </TabsContent>
 
-          {/* Analytics and Receipts tabs can be migrated similarly, using payments data */}
+          <TabsContent value="analytics" className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Monthly Payments Trend */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Monthly Payment Trends</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-[300px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={monthlyTrends}>
+                        <XAxis dataKey="month" />
+                        <YAxis />
+                        <RechartsTooltip />
+                        <Line type="monotone" dataKey="rent" stroke="#10b981" strokeWidth={2} name="Rent" />
+                        <Line type="monotone" dataKey="water" stroke="#3b82f6" strokeWidth={2} name="Water" />
+                        <Line type="monotone" dataKey="total" stroke="#6366f1" strokeWidth={2} name="Total" />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                </CardContent>
+              </Card>
+              {/* Expense Breakdown */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Expense Breakdown</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-[300px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={expenseBreakdown}
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={60}
+                          outerRadius={100}
+                          paddingAngle={5}
+                          dataKey="value"
+                        >
+                          {expenseBreakdown.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.color} />
+                          ))}
+                        </Pie>
+                        <RechartsTooltip formatter={(value, name, props) => [`KSh ${value.toLocaleString()}`, name]} />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="receipts" className="space-y-6">
+            {/* Receipt Gallery */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Receipt Gallery</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                  {payments.length === 0 ? (
+                    <div className="text-gray-500 col-span-full text-center">No receipts found.</div>
+                  ) : payments.map((payment) => (
+                    <div key={payment.id} className="border rounded-lg p-4 text-center hover:shadow-md transition-shadow">
+                      <Receipt className="w-8 h-8 mx-auto mb-2 text-gray-400" />
+                      <div className="text-sm font-medium">{payment.type}</div>
+                      <div className="text-xs text-gray-500">{payment.date}</div>
+                      <Button variant="outline" size="sm" className="mt-2">
+                        <Eye className="w-3 h-3 mr-1" />
+                        View
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
         </Tabs>
       </div>
 
