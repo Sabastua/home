@@ -14,6 +14,8 @@ import AdminAuth from '@/components/AdminAuth';
 import PropertyManagement from '@/components/PropertyManagement';
 import PaymentManagement from '@/components/PaymentManagement';
 import jsPDF from 'jspdf';
+import { supabase } from '@/lib/supabaseClient';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 
 const AdminDashboard = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -55,6 +57,9 @@ const AdminDashboard = () => {
     },
   ];
 
+  const [monthlyData, setMonthlyData] = useState([]);
+  const [properties, setProperties] = useState([]);
+
   function downloadReceipt(receipt) {
     const doc = new jsPDF();
     doc.setFontSize(16);
@@ -74,6 +79,32 @@ const AdminDashboard = () => {
     if (adminAuth === 'true') {
       setIsAuthenticated(true);
     }
+  }, []);
+
+  useEffect(() => {
+    async function fetchMonthlyRent() {
+      // Example: fetch all payments and group by month in JS (for demo)
+      const { data, error } = await supabase
+        .from('payments')
+        .select('amount, date_paid');
+      if (error) return;
+      // Group by month
+      const grouped = {};
+      data.forEach(({ amount, date_paid }) => {
+        const month = date_paid.slice(0, 7); // 'YYYY-MM'
+        grouped[month] = (grouped[month] || 0) + amount;
+      });
+      setMonthlyData(Object.entries(grouped).map(([month, total]) => ({ month, total })));
+    }
+    fetchMonthlyRent();
+  }, []);
+
+  useEffect(() => {
+    async function fetchProperties() {
+      const { data, error } = await supabase.from('properties').select('*');
+      if (!error) setProperties(data);
+    }
+    fetchProperties();
   }, []);
 
   const handleLogin = () => {
@@ -118,6 +149,25 @@ const AdminDashboard = () => {
     console.log('Property listing submitted:', formData);
     alert('Property listed successfully!');
   };
+
+  async function addProperty(newProperty) {
+    const { data, error } = await supabase.from('properties').insert([newProperty]);
+    if (!error) {
+      // Optionally refetch properties or update state
+    }
+  }
+
+  async function addFavorite(userId, propertyId) {
+    const { data, error } = await supabase.from('favorites').insert([{ user_id: userId, property_id: propertyId }]);
+    if (!error) {
+      // Optionally refetch favorites or update state
+    }
+  }
+
+  async function fetchFavorites(userId) {
+    const { data } = await supabase.from('favorites').select('property_id').eq('user_id', userId);
+    return data.map(favorite => favorite.property_id);
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -184,6 +234,24 @@ const AdminDashboard = () => {
                   ))}
                 </tbody>
               </table>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle>Monthly Rent Collected</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div style={{ width: '100%', height: 300 }}>
+              <ResponsiveContainer>
+                <BarChart data={monthlyData}>
+                  <XAxis dataKey="month" />
+                  <YAxis />
+                  <Tooltip />
+                  <Bar dataKey="total" fill="#8884d8" />
+                </BarChart>
+              </ResponsiveContainer>
             </div>
           </CardContent>
         </Card>
