@@ -5,40 +5,33 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import PaymentButton from '@/components/PaymentButton';
-import { fetchFavorites, removeFavorite, getCurrentUserId } from '@/lib/favorites';
 import { supabase } from '@/lib/supabaseClient';
+import { useFavorites } from '@/hooks/use-favorites';
 
 const Favorites = () => {
-  const [userId, setUserId] = useState<string | null>(null);
+  const { favorites, removeFavorite, loading: favLoading } = useFavorites();
   const [properties, setProperties] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function getUserAndFavorites() {
+    async function fetchFavoriteProperties() {
       setLoading(true);
-      const id = await getCurrentUserId();
-      setUserId(id);
-      if (id) {
-        const favIds = await fetchFavorites(id);
-        if (favIds.length > 0) {
-          // Fetch property details for these IDs
-          const { data, error } = await supabase
-            .from('properties')
-            .select('*')
-            .in('id', favIds);
-          setProperties(data || []);
-        } else {
-          setProperties([]);
-        }
+      if (favorites.length > 0) {
+        const { data, error } = await supabase
+          .from('properties')
+          .select('*')
+          .in('id', favorites);
+        setProperties(data || []);
+      } else {
+        setProperties([]);
       }
       setLoading(false);
     }
-    getUserAndFavorites();
-  }, []);
+    fetchFavoriteProperties();
+  }, [favorites]);
 
-  const removeFavoriteHandler = async (propertyId: number) => {
-    if (!userId) return;
-    await removeFavorite(userId, propertyId);
+  const removeFavoriteHandler = async (propertyId: string) => {
+    await removeFavorite(propertyId);
     setProperties(properties.filter(p => p.id !== propertyId));
   };
 
@@ -64,7 +57,6 @@ const Favorites = () => {
           </div>
         </div>
       </header>
-
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Page Header */}
         <div className="text-center mb-8">
@@ -74,8 +66,7 @@ const Favorites = () => {
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Your Favorite Properties</h1>
           <p className="text-gray-600">Properties you've saved for later</p>
         </div>
-
-        {loading ? (
+        {(loading || favLoading) ? (
           <div className="text-center py-16">Loading favorites...</div>
         ) : properties.length === 0 ? (
           <div className="text-center py-16">
@@ -92,81 +83,52 @@ const Favorites = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {properties.map(property => {
-              const waterBillCost = typeof property['waterBillCost'] === 'number' ? property['waterBillCost'] : 0;
-              return (
-                <Card key={property.id} className="overflow-hidden hover:shadow-xl transition-all duration-300 rounded-3xl border-0 bg-white shadow-sm hover:scale-[1.02]">
-                  <CardContent className="p-0">
-                    <div className="relative">
-                      <img 
-                        src={property.image} 
-                        alt={property.title}
-                        className="w-full h-48 object-cover"
-                      />
-                      <Badge className="absolute top-3 right-3 bg-white/90 text-gray-700 rounded-full shadow-lg backdrop-blur-sm">
-                        {property.type}
-                      </Badge>
-                      <Button
-                        onClick={() => removeFavoriteHandler(property.id)}
-                        className="absolute top-3 left-3 w-10 h-10 rounded-full bg-red-500/90 hover:bg-red-600 text-white p-0 shadow-lg backdrop-blur-sm"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                      <div className="absolute bottom-3 left-3">
-                        <Badge className={`${property.available ? 'bg-green-500/90' : 'bg-red-500/90'} text-white rounded-full shadow-lg backdrop-blur-sm`}>
-                          {property.available ? 'Available' : 'Occupied'}
-                        </Badge>
-                      </div>
+            {properties.map(property => (
+              <Card key={property.id} className="overflow-hidden hover:shadow-xl transition-all duration-300 rounded-3xl border-0 bg-white shadow-sm hover:scale-[1.02]">
+                <CardContent className="p-0">
+                  <div className="relative">
+                    <img 
+                      src={property.image || '/property1.jpg'} 
+                      alt={property.title}
+                      className="w-full h-48 object-cover"
+                    />
+                    <Badge className="absolute top-3 right-3 bg-white/90 text-gray-700 rounded-full shadow-lg backdrop-blur-sm">
+                      {property.type}
+                    </Badge>
+                    <Button
+                      onClick={() => removeFavoriteHandler(property.id)}
+                      className="absolute top-3 left-3 w-10 h-10 rounded-full bg-red-500/90 hover:bg-red-600 text-white p-0 shadow-lg backdrop-blur-sm"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                  <CardContent className="p-5">
+                    <h4 className="font-semibold text-lg mb-2 text-gray-900">{property.title}</h4>
+                    <div className="flex items-center text-gray-500 mb-3">
+                      <MapPin className="w-4 h-4 mr-1" />
+                      <span className="text-sm">{property.location}</span>
                     </div>
-                    <CardContent className="p-5">
-                      <h4 className="font-semibold text-lg mb-2 text-gray-900">{property.title}</h4>
-                      <div className="flex items-center text-gray-500 mb-3">
-                        <MapPin className="w-4 h-4 mr-1" />
-                        <span className="text-sm">{property.location}</span>
+                    <div className="text-2xl font-bold text-gray-900 mb-4">
+                      KSh {property.rent.toLocaleString()}
+                      <span className="text-sm text-gray-500 font-normal">/month</span>
+                    </div>
+                    {property.description && (
+                      <div className="mb-4 text-gray-700 text-sm">
+                        {property.description}
                       </div>
-                      <div className="text-2xl font-bold text-gray-900 mb-4">
-                        KSh {property.rent.toLocaleString()}
-                        <span className="text-sm text-gray-500 font-normal">/month</span>
-                      </div>
-                      <div className="flex flex-wrap gap-1 mb-4">
-                        {property.features && property.features.slice(0, 2).map((feature, index) => (
-                          <Badge key={index} variant="secondary" className="text-xs bg-gray-100 text-gray-600 rounded-full">
-                            {feature}
-                          </Badge>
-                        ))}
-                        {property.features && property.features.length > 2 && (
-                          <Badge variant="secondary" className="text-xs bg-gray-100 text-gray-600 rounded-full">
-                            +{property.features.length - 2} more
-                          </Badge>
-                        )}
-                      </div>
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center text-pink-600">
-                          <Star className="w-4 h-4 mr-1 fill-current" />
-                          <span className="text-sm font-medium">{property.rating}</span>
-                          <span className="text-xs text-gray-500 ml-1">({property.reviews} reviews)</span>
-                        </div>
-                        <span className="text-sm text-gray-500">{property.beds ?? '-'} bed • {property.baths ?? '-'} bath</span>
-                      </div>
-                      <div className="space-y-2">
-                        <Link to={`/property/${property.id}`} className="w-full block">
-                          <Button className="w-full bg-gradient-to-r from-pink-500 to-red-600 hover:from-pink-600 hover:to-red-700 text-white rounded-2xl py-3 shadow-lg">
-                            View Details
-                            <ChevronRight className="w-4 h-4 ml-2" />
-                          </Button>
-                        </Link>
-                        <PaymentButton
-                          propertyId={property.id}
-                          propertyTitle={property.title}
-                          rent={property.rent}
-                          waterBill={waterBillCost}
-                        />
-                      </div>
-                    </CardContent>
+                    )}
+                    <div className="space-y-2">
+                      <Link to={`/property/${property.id}`} className="w-full block">
+                        <Button className="w-full bg-gradient-to-r from-pink-500 to-red-600 hover:from-pink-600 hover:to-red-700 text-white rounded-2xl py-3 shadow-lg">
+                          View Details
+                          <ChevronRight className="w-4 h-4 ml-2" />
+                        </Button>
+                      </Link>
+                    </div>
                   </CardContent>
-                </Card>
-              );
-            })}
+                </CardContent>
+              </Card>
+            ))}
           </div>
         )}
         {properties.length > 0 && (

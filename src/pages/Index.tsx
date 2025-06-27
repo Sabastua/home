@@ -9,16 +9,16 @@ import { useToast } from '@/hooks/use-toast';
 import MobileSwipeView from '@/components/MobileSwipeView';
 import PaymentButton from '@/components/PaymentButton';
 import { supabase } from '@/lib/supabaseClient';
-import { fetchFavorites, addFavorite, removeFavorite, getCurrentUserId } from '@/lib/favorites';
+import { useFavorites } from '@/hooks/use-favorites';
+import { addSampleProperties } from '@/lib/sampleData';
 
 const Index = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [favorites, setFavorites] = useState<number[]>([]);
   const [isMobile, setIsMobile] = useState(false);
-  const { toast } = useToast();
-  const [properties, setProperties] = useState([]);
+  const [properties, setProperties] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [userId, setUserId] = useState<string | null>(null);
+  const { toast } = useToast();
+  const { favorites, toggleFavorite, isFavorite } = useFavorites();
 
   useEffect(() => {
     const handleResize = () => {
@@ -31,61 +31,88 @@ const Index = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  useEffect(() => {
-    async function getUserAndFavorites() {
-      const id = await getCurrentUserId();
-      setUserId(id);
-      if (id) {
-        const favs = await fetchFavorites(id);
-        setFavorites(favs);
-      }
-    }
-    getUserAndFavorites();
-  }, []);
-
+  // Fetch properties from database
   useEffect(() => {
     async function fetchProperties() {
       setLoading(true);
-      const { data, error } = await supabase.from('properties').select('*');
-      if (!error) setProperties(data);
-      setLoading(false);
+      try {
+        const { data, error } = await supabase
+          .from('properties')
+          .select('*')
+          .order('created_at', { ascending: false });
+        if (error) {
+          console.error('Error fetching properties:', error);
+          toast({
+            title: "Error",
+            description: "Failed to load properties. Please try again.",
+            variant: "destructive"
+          });
+        } else {
+          const transformedProperties = data?.map(property => ({
+            id: property.id,
+            title: property.title,
+            location: property.location,
+            rent: property.rent,
+            type: property.type,
+            description: property.description,
+            created_at: property.created_at,
+            image: '/property1.jpg', // fallback image
+            features: [],
+            beds: 1,
+            baths: 1,
+            available: true,
+            rating: 4.0,
+            reviews: 0,
+          })) || [];
+          setProperties(transformedProperties);
+        }
+      } catch (error) {
+        console.error('Error fetching properties:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load properties. Please try again.",
+          variant: "destructive"
+        });
+      } finally {
+        setLoading(false);
+      }
     }
+
     fetchProperties();
-  }, []);
+  }, [toast]);
 
   const filteredProperties = properties.filter(property =>
     property.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    property.location.toLowerCase().includes(searchTerm.toLowerCase())
+    property.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    property.type.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const toggleFavorite = async (propertyId: number) => {
-    if (!userId) {
-      toast({ title: 'Please log in to save favorites.' });
-      return;
-    }
-    let updatedFavorites;
-    if (favorites.includes(propertyId)) {
-      await removeFavorite(userId, propertyId);
-      updatedFavorites = favorites.filter(id => id !== propertyId);
-      toast({ title: 'Removed from favorites', description: 'Property removed from your favorites list' });
-    } else {
-      await addFavorite(userId, propertyId);
-      updatedFavorites = [...favorites, propertyId];
-      toast({ title: 'Added to favorites', description: 'Property added to your favorites list' });
-    }
-    setFavorites(updatedFavorites);
-  };
-
   if (loading) {
-    return <div className="flex justify-center items-center min-h-screen">Loading properties...</div>;
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <div className="w-16 h-16 border-4 border-green-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <p className="text-gray-600">Loading properties...</p>
+        </div>
+      </div>
+    );
   }
 
   if (isMobile) {
+    // Convert favorites (string[]) to number[] for MobileSwipeView
+    const favoriteIds = favorites.map(id => {
+      const num = Number(id);
+      return isNaN(num) ? -1 : num;
+    }).filter(id => id !== -1);
+    // Handler to convert number to string for toggleFavorite
+    const handleToggleFavorite = (propertyId: number) => {
+      toggleFavorite(propertyId.toString());
+    };
     return (
       <MobileSwipeView 
         properties={filteredProperties}
-        favorites={favorites}
-        onToggleFavorite={toggleFavorite}
+        favorites={favoriteIds}
+        onToggleFavorite={handleToggleFavorite}
       />
     );
   }
@@ -163,93 +190,83 @@ const Index = () => {
           </h3>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredProperties.map(property => {
-            const isFavorite = favorites.includes(property.id);
-            // Color mapping for property types
-            const typeColorMap = {
-              'Bedsitter': 'hover:border-blue-500',
-              '1BR': 'hover:border-green-500',
-              '2BR': 'hover:border-purple-500',
-              '3BR': 'hover:border-orange-500',
-              'Studio': 'hover:border-pink-500',
-            };
-            const borderColor = typeColorMap[property.type] || 'hover:border-gray-500';
-            const cardClass = `transition-transform duration-300 transform hover:scale-105 hover:shadow-xl border-2 border-transparent ${borderColor}`;
-
-            return (
-              <Card key={property.id} className={cardClass}>
-                <CardContent className="p-0">
-                  <div className="relative">
-                    <img 
-                      src={property.image} 
-                      alt={property.title}
-                      className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => toggleFavorite(property.id)}
-                      className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm hover:bg-white shadow-lg"
-                    >
-                      <Star 
-                        className={`w-5 h-5 ${favorites.includes(property.id) ? 'fill-yellow-500 text-yellow-500' : 'text-gray-600'}`} 
-                      />
-                    </Button>
-                    <Badge className="absolute top-4 left-4 bg-green-600 text-white">
-                      {property.type}
-                    </Badge>
-                  </div>
-                  
-                  <CardContent className="p-6">
-                    <div className="flex justify-between items-start mb-3">
-                      <h4 className="font-bold text-lg text-gray-900 group-hover:text-green-600 transition-colors">
-                        {property.title}
-                      </h4>
-                      <div className="text-right">
-                        <p className="text-2xl font-bold text-green-600">
-                          KSh {property.rent.toLocaleString()}
-                        </p>
-                        <p className="text-sm text-gray-500">per month</p>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center text-gray-600 mb-4">
-                      <MapPin className="w-4 h-4 mr-2" />
-                      <span className="text-sm">{property.location}</span>
-                    </div>
-                    
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center">
-                        <Star className="w-4 h-4 text-yellow-500 mr-1" />
-                        <span className="text-sm font-medium">{property.rating}</span>
-                      </div>
-                      <span className="text-sm text-gray-500">{property.beds} bed • {property.baths} bath</span>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Link to={`/property/${property.id}`}>
-                        <Button variant="outline" className="w-full rounded-2xl font-semibold">
-                          View Details
-                        </Button>
-                      </Link>
-                      <PaymentButton
-                        propertyId={property.id}
-                        propertyTitle={property.title}
-                        rent={property.rent}
-                        waterBill={property.waterBillCost}
-                      />
-                    </div>
-                  </CardContent>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
-
-        {filteredProperties.length === 0 && (
+        {filteredProperties.length === 0 ? (
           <div className="text-center py-16">
-            <p className="text-xl text-gray-500">No properties found matching your search.</p>
+            <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Search className="w-12 h-12 text-gray-400" />
+            </div>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">No properties found</h3>
+            <p className="text-gray-600 mb-4">
+              {searchTerm ? `No properties match "${searchTerm}". Try adjusting your search.` : 'No properties are currently available.'}
+            </p>
+            {searchTerm && (
+              <Button 
+                variant="outline" 
+                onClick={() => setSearchTerm('')}
+                className="mx-auto"
+              >
+                Clear Search
+              </Button>
+            )}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredProperties.map(property => {
+              const cardClass = `transition-transform duration-300 transform hover:scale-105 hover:shadow-xl border-2 border-transparent hover:border-green-500`;
+              return (
+                <Card key={property.id} className={cardClass}>
+                  <CardContent className="p-0">
+                    <div className="relative">
+                      <img 
+                        src={property.image} 
+                        alt={property.title}
+                        className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => toggleFavorite(property.id)}
+                        className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm hover:bg-white shadow-lg"
+                      >
+                        <Star 
+                          className={`w-5 h-5 ${isFavorite(property.id) ? 'fill-yellow-500 text-yellow-500' : 'text-gray-600'}`} 
+                        />
+                      </Button>
+                      <Badge className="absolute top-4 left-4 bg-green-600 text-white">
+                        {property.type}
+                      </Badge>
+                    </div>
+                    
+                    <CardContent className="p-6">
+                      <div className="flex justify-between items-start mb-3">
+                        <h4 className="font-bold text-lg text-gray-900 group-hover:text-green-600 transition-colors">
+                          {property.title}
+                        </h4>
+                        <div className="text-right">
+                          <p className="text-2xl font-bold text-green-600">
+                            KSh {property.rent.toLocaleString()}
+                          </p>
+                          <p className="text-sm text-gray-500">per month</p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center text-gray-600 mb-4">
+                        <MapPin className="w-4 h-4 mr-2" />
+                        <span className="text-sm">{property.location}</span>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Link to={`/property/${property.id}`}>
+                          <Button variant="outline" className="w-full rounded-2xl font-semibold">
+                            View Details
+                          </Button>
+                        </Link>
+                      </div>
+                    </CardContent>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         )}
       </section>

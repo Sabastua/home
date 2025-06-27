@@ -18,7 +18,7 @@ import { supabase } from '@/lib/supabaseClient';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 
 const AdminDashboard = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState<null | boolean>(null);
   const [formData, setFormData] = useState({
     title: '',
     type: '',
@@ -76,58 +76,30 @@ const AdminDashboard = () => {
   }
 
   useEffect(() => {
+    let mounted = true;
     async function checkSession() {
       const { data } = await supabase.auth.getSession();
-      setIsAuthenticated(!!data.session);
+      if (mounted) setIsAuthenticated(!!data.session);
     }
     checkSession();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsAuthenticated(!!session);
+    });
+
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
-  useEffect(() => {
-    async function fetchMonthlyRent() {
-      // Example: fetch all payments and group by month in JS (for demo)
-      const { data, error } = await supabase
-        .from('payments')
-        .select('amount, date_paid');
-      if (error) return;
-      // Group by month
-      const grouped = {};
-      data.forEach(({ amount, date_paid }) => {
-        const month = date_paid.slice(0, 7); // 'YYYY-MM'
-        grouped[month] = (grouped[month] || 0) + amount;
-      });
-      setMonthlyData(Object.entries(grouped).map(([month, total]) => ({ month, total })));
-    }
-    fetchMonthlyRent();
-  }, []);
-
-  useEffect(() => {
-    async function fetchProperties() {
-      const { data, error } = await supabase.from('properties').select('*');
-      if (!error) setProperties(data);
-    }
-    fetchProperties();
-  }, []);
-
-  useEffect(() => {
-    async function fetchPayments() {
-      const { data, error } = await supabase.from('payments').select('*');
-      if (!error) setPayments(data);
-    }
-    fetchPayments();
-  }, []);
-
-  const handleLogin = () => {
-    setIsAuthenticated(true);
-  };
-
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    setIsAuthenticated(false);
-  };
+  if (isAuthenticated === null) {
+    // Still checking auth state
+    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  }
 
   if (!isAuthenticated) {
-    return <AdminAuth onLogin={handleLogin} />;
+    return <AdminAuth onLogin={() => setIsAuthenticated(true)} />;
   }
 
   const handleInputChange = (field: string, value: string) => {
@@ -223,7 +195,7 @@ const AdminDashboard = () => {
               <Link to="/">
                 <Button variant="outline">Back to Home</Button>
               </Link>
-              <Button variant="outline" onClick={handleLogout}>
+              <Button variant="outline" onClick={() => setIsAuthenticated(false)}>
                 <LogOut className="w-4 h-4 mr-2" />
                 Logout
               </Button>
@@ -233,300 +205,56 @@ const AdminDashboard = () => {
       </header>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle>Tenant Payment Receipts</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead>
-                  <tr>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Tenant</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Amount Paid</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Water Bill</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Rent</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Deposit</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Date Paid</th>
-                    <th className="px-4 py-2"></th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {tenantReceipts.map((receipt, idx) => (
-                    <tr key={idx}>
-                      <td className="px-4 py-2 whitespace-nowrap">{receipt.tenantName}</td>
-                      <td className="px-4 py-2 whitespace-nowrap">KSh {receipt.amountPaid.toLocaleString()}</td>
-                      <td className="px-4 py-2 whitespace-nowrap">KSh {receipt.waterBill.toLocaleString()}</td>
-                      <td className="px-4 py-2 whitespace-nowrap">KSh {receipt.rent.toLocaleString()}</td>
-                      <td className="px-4 py-2 whitespace-nowrap">KSh {receipt.deposit.toLocaleString()}</td>
-                      <td className="px-4 py-2 whitespace-nowrap">{receipt.datePaid}</td>
-                      <td className="px-4 py-2 whitespace-nowrap">
-                        <Button size="sm" variant="outline" onClick={() => downloadReceipt(receipt)}>
-                          Download PDF
-                        </Button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle>Monthly Rent Collected</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div style={{ width: '100%', height: 300 }}>
-              <ResponsiveContainer>
-                <BarChart data={monthlyData}>
-                  <XAxis dataKey="month" />
-                  <YAxis />
-                  <Tooltip />
-                  <Bar dataKey="total" fill="#8884d8" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Tabs defaultValue="add-property" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="add-property">Add Property</TabsTrigger>
-            <TabsTrigger value="manage-properties">Manage Properties</TabsTrigger>
-            <TabsTrigger value="payments">Payment Management</TabsTrigger>
+        <Tabs defaultValue="overview" className="w-full">
+          <TabsList className="mb-6 flex flex-wrap gap-2">
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="properties">Properties</TabsTrigger>
+            <TabsTrigger value="tenants">Tenants</TabsTrigger>
+            <TabsTrigger value="analytics">Analytics</TabsTrigger>
+            <TabsTrigger value="reports">Reports</TabsTrigger>
           </TabsList>
-
-          <TabsContent value="add-property">
-            <div className="mb-8">
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">List New Property</h2>
-              <p className="text-gray-600">Add a new rental property to Nakuru HomesConnect</p>
-            </div>
-
-            <form onSubmit={handleSubmit} className="space-y-8">
-              {/* Basic Information */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Basic Information</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <Label htmlFor="title">Property Title</Label>
-                      <Input
-                        id="title"
-                        placeholder="e.g., Modern 2BR Apartment"
-                        value={formData.title}
-                        onChange={(e) => handleInputChange('title', e.target.value)}
-                        required
-                      />
-                    </div>
-
-                    <div>
-                      <Label htmlFor="rent">Monthly Rent (KSh)</Label>
-                      <Input
-                        id="rent"
-                        type="number"
-                        placeholder="25000"
-                        value={formData.rent}
-                        onChange={(e) => handleInputChange('rent', e.target.value)}
-                        required
-                      />
-                    </div>
-
-                    <div>
-                      <Label htmlFor="type">Property Type</Label>
-                      <Select onValueChange={(value) => handleInputChange('type', value)}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select property type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {propertyTypes.map(type => (
-                            <SelectItem key={type} value={type}>{type}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div>
-                      <Label htmlFor="location">Location</Label>
-                      <Select onValueChange={(value) => handleInputChange('location', value)}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select location" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {locations.map(location => (
-                            <SelectItem key={location} value={location}>{location}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-
-                  <div>
-                    <Label htmlFor="description">Property Description</Label>
-                    <Textarea
-                      id="description"
-                      placeholder="Describe the property, its features, and surroundings..."
-                      value={formData.description}
-                      onChange={(e) => handleInputChange('description', e.target.value)}
-                      rows={4}
-                      required
-                    />
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Features & Amenities */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Features & Amenities</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <Label>Selected Features</Label>
-                    <div className="flex flex-wrap gap-2 mt-2">
-                      {formData.features.map(feature => (
-                        <Badge key={feature} variant="secondary" className="cursor-pointer">
-                          {feature}
-                          <button
-                            type="button"
-                            onClick={() => removeFeature(feature)}
-                            className="ml-2 text-red-500 hover:text-red-700"
-                          >
-                            ×
-                          </button>
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div>
-                    <Label>Common Features</Label>
-                    <div className="flex flex-wrap gap-2 mt-2">
-                      {commonFeatures.map(feature => (
-                        <Button
-                          key={feature}
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          onClick={() => addFeature(feature)}
-                          disabled={formData.features.includes(feature)}
-                        >
-                          <Plus className="w-4 h-4 mr-1" />
-                          {feature}
-                        </Button>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="flex gap-2">
-                    <Input
-                      placeholder="Add custom feature..."
-                      value={newFeature}
-                      onChange={(e) => setNewFeature(e.target.value)}
-                    />
-                    <Button
-                      type="button"
-                      onClick={() => addFeature(newFeature)}
-                      disabled={!newFeature}
-                    >
-                      Add
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Images */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Property Images</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-                    <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">Upload Property Images</h3>
-                    <p className="text-gray-600 mb-4">Drag and drop images or click to browse</p>
-                    <Button type="button" variant="outline">
-                      Select Images
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Landlord Information */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Landlord Information</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <Label htmlFor="landlordName">Landlord Name</Label>
-                      <Input
-                        id="landlordName"
-                        placeholder="John Kamau"
-                        value={formData.landlordName}
-                        onChange={(e) => handleInputChange('landlordName', e.target.value)}
-                        required
-                      />
-                    </div>
-
-                    <div>
-                      <Label htmlFor="landlordPhone">Phone Number</Label>
-                      <Input
-                        id="landlordPhone"
-                        placeholder="+254 712 345 678"
-                        value={formData.landlordPhone}
-                        onChange={(e) => handleInputChange('landlordPhone', e.target.value)}
-                        required
-                      />
-                    </div>
-
-                    <div>
-                      <Label htmlFor="paybill">M-PESA Paybill Number</Label>
-                      <Input
-                        id="paybill"
-                        placeholder="522533"
-                        value={formData.paybill}
-                        onChange={(e) => handleInputChange('paybill', e.target.value)}
-                        required
-                      />
-                    </div>
-
-                    <div>
-                      <Label htmlFor="accountNumber">Account Number</Label>
-                      <Input
-                        id="accountNumber"
-                        placeholder="HOUSE001"
-                        value={formData.accountNumber}
-                        onChange={(e) => handleInputChange('accountNumber', e.target.value)}
-                        required
-                      />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Submit */}
-              <div className="flex justify-end space-x-4">
-                <Button type="button" variant="outline">
-                  Save as Draft
-                </Button>
-                <Button type="submit" className="bg-green-600 hover:bg-green-700">
-                  List Property
-                </Button>
-              </div>
-            </form>
+          <TabsContent value="overview">
+            <Card className="mb-8">
+              <CardHeader>
+                <CardTitle>Overview</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-gray-600">Summary stats and quick links will go here.</div>
+              </CardContent>
+            </Card>
           </TabsContent>
-
-          <TabsContent value="manage-properties">
+          <TabsContent value="properties">
             <PropertyManagement />
           </TabsContent>
-
-          <TabsContent value="payments">
-            <PaymentManagement />
+          <TabsContent value="tenants">
+            <Card className="mb-8">
+              <CardHeader>
+                <CardTitle>Tenants</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-gray-600">List of tenants will go here.</div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          <TabsContent value="analytics">
+            <Card className="mb-8">
+              <CardHeader>
+                <CardTitle>Analytics</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-gray-600">Analytics charts and data will go here.</div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          <TabsContent value="reports">
+            <Card className="mb-8">
+              <CardHeader>
+                <CardTitle>Reports</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-gray-600">Financial and payment reports will go here.</div>
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
       </div>
