@@ -10,7 +10,6 @@ import MobileSwipeView from '@/components/MobileSwipeView';
 import PaymentButton from '@/components/PaymentButton';
 import { supabase } from '@/lib/supabaseClient';
 import { useFavorites } from '@/hooks/use-favorites';
-import { addSampleProperties } from '@/lib/sampleData';
 
 const Index = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -188,6 +187,41 @@ const Index = () => {
           <h3 className="text-2xl font-bold text-gray-900">
             Available Properties ({filteredProperties.length})
           </h3>
+          <Button
+            variant="outline"
+            onClick={async () => {
+              setLoading(true);
+              try {
+                const { data, error } = await supabase
+                  .from('properties')
+                  .select('*')
+                  .order('created_at', { ascending: false });
+                if (!error) {
+                  const transformedProperties = data?.map(property => ({
+                    id: property.id,
+                    title: property.title,
+                    location: property.location,
+                    rent: property.rent,
+                    type: property.type,
+                    description: property.description,
+                    created_at: property.created_at,
+                    image: '/property1.jpg', // fallback image
+                    features: [],
+                    beds: 1,
+                    baths: 1,
+                    available: true,
+                    rating: 4.0,
+                    reviews: 0,
+                  })) || [];
+                  setProperties(transformedProperties);
+                }
+              } finally {
+                setLoading(false);
+              }
+            }}
+          >
+            Refresh
+          </Button>
         </div>
 
         {filteredProperties.length === 0 ? (
