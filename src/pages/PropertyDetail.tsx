@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import PaymentModal from '@/components/PaymentModal';
 import { getCurrentUserId, fetchFavorites, addFavorite, removeFavorite } from '@/lib/favorites';
+import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from '@/components/ui/carousel';
 
 // Enhanced property data with comprehensive information for all 10 properties
 const propertyData = {
@@ -525,22 +526,23 @@ const PropertyDetail = () => {
             <Card className="overflow-hidden rounded-3xl border-0 shadow-sm">
               <CardContent className="p-0">
                 <div className="relative">
-                  <img 
-                    src={property.images[currentImageIndex]} 
-                    alt={property.title}
-                    className="w-full h-64 sm:h-80 lg:h-96 object-cover"
-                  />
-                  <div className="absolute bottom-4 left-4 flex space-x-2">
-                    {property.images.map((_, index) => (
-                      <button
-                        key={index}
-                        onClick={() => setCurrentImageIndex(index)}
-                        className={`w-3 h-3 rounded-full transition-all ${
-                          currentImageIndex === index ? 'bg-white shadow-lg' : 'bg-white/60'
-                        }`}
-                      />
-                    ))}
-                  </div>
+                  <Carousel className="w-full">
+                    <CarouselContent>
+                      {property.images.map((img, idx) => (
+                        <CarouselItem key={idx} className="w-full">
+                          <img
+                            src={img}
+                            alt={`${property.title} photo ${idx + 1}`}
+                            className="w-full h-64 sm:h-80 lg:h-96 object-cover rounded-3xl"
+                            draggable={false}
+                            loading="eager"
+                          />
+                        </CarouselItem>
+                      ))}
+                    </CarouselContent>
+                    <CarouselPrevious className="absolute left-2 top-1/2 -translate-y-1/2 z-10" />
+                    <CarouselNext className="absolute right-2 top-1/2 -translate-y-1/2 z-10" />
+                  </Carousel>
                   <div className="absolute top-4 right-4">
                     <Badge className="bg-green-500/90 text-white rounded-full shadow-lg backdrop-blur-sm">
                       Available

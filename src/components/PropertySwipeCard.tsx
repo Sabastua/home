@@ -1,8 +1,10 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, lazy } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { MapPin, Star, Heart, X, Wifi, Car, Shield, Zap } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 
 interface Property {
   id: number;
@@ -16,6 +18,8 @@ interface Property {
   available: boolean;
   rating: number;
   reviews: number;
+  beds: number;
+  baths: number;
 }
 
 interface PropertySwipeCardProps {
@@ -25,6 +29,8 @@ interface PropertySwipeCardProps {
   isActive: boolean;
   isDesktop?: boolean;
 }
+
+const PaymentButton = lazy(() => import('./PaymentButton'));
 
 const PropertySwipeCard: React.FC<PropertySwipeCardProps> = ({
   property,
@@ -38,6 +44,7 @@ const PropertySwipeCard: React.FC<PropertySwipeCardProps> = ({
   const [swipeDirection, setSwipeDirection] = useState<'left' | 'right' | null>(null);
   const cardRef = useRef<HTMLDivElement>(null);
   const startPos = useRef({ x: 0, y: 0 });
+  const navigate = useNavigate();
 
   const getFeatureIcon = (feature: string) => {
     switch (feature.toLowerCase()) {
@@ -229,7 +236,7 @@ const PropertySwipeCard: React.FC<PropertySwipeCardProps> = ({
 
   return (
     <div className="fixed inset-4 z-30">
-      <Card
+      <motion.div
         ref={cardRef}
         className={`
           relative w-full h-full overflow-hidden cursor-grab active:cursor-grabbing
@@ -248,27 +255,36 @@ const PropertySwipeCard: React.FC<PropertySwipeCardProps> = ({
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
+        initial={{ scale: 0.95, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.95, opacity: 0 }}
+        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
       >
-        {/* Swipe Direction Overlays */}
-        {swipeDirection && isActive && (
-          <>
-            {swipeDirection === 'right' && (
-              <div className="absolute inset-0 bg-green-500/30 backdrop-blur-sm z-50 flex items-center justify-center animate-pulse rounded-3xl">
-                <div className="bg-green-500 rounded-full p-6 shadow-2xl animate-bounce">
-                  <Heart className="w-16 h-16 text-white" />
-                </div>
-              </div>
-            )}
-            {swipeDirection === 'left' && (
-              <div className="absolute inset-0 bg-red-500/30 backdrop-blur-sm z-50 flex items-center justify-center animate-pulse rounded-3xl">
-                <div className="bg-red-500 rounded-full p-6 shadow-2xl animate-bounce">
-                  <X className="w-16 h-16 text-white" />
-                </div>
-              </div>
-            )}
-          </>
+        {/* Floating Action Buttons */}
+        {isActive && (
+          <div className="absolute top-1/2 left-0 right-0 flex justify-between px-6 z-50 pointer-events-none select-none">
+            <motion.button
+              className="bg-white rounded-full shadow-lg w-14 h-14 flex items-center justify-center border-2 border-red-500 text-red-500 text-2xl pointer-events-auto"
+              whileTap={{ scale: 0.85 }}
+              whileHover={{ scale: 1.1 }}
+              onClick={(e) => { e.stopPropagation(); onSwipe('left', property.id); }}
+              aria-label="Cancel"
+              style={{ boxShadow: '0 4px 16px rgba(255,0,0,0.08)' }}
+            >
+              <X className="w-7 h-7" />
+            </motion.button>
+            <motion.button
+              className="bg-gradient-to-r from-pink-500 to-red-500 rounded-full shadow-lg w-14 h-14 flex items-center justify-center text-white text-2xl pointer-events-auto"
+              whileTap={{ scale: 0.85 }}
+              whileHover={{ scale: 1.1 }}
+              onClick={(e) => { e.stopPropagation(); onSwipe('right', property.id); }}
+              aria-label="Like"
+              style={{ boxShadow: '0 4px 16px rgba(255,0,0,0.08)' }}
+            >
+              <Heart className="w-7 h-7" />
+            </motion.button>
+          </div>
         )}
-
         {/* Property Card Content */}
         <div className="relative h-full overflow-hidden rounded-3xl">
           {/* High Quality Property Image */}
@@ -284,10 +300,8 @@ const PropertySwipeCard: React.FC<PropertySwipeCardProps> = ({
                 objectPosition: 'center'
               }}
             />
-            
             {/* Subtle Gradient Overlay */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/20" />
-            
             {/* Top Status Bar */}
             <div className="absolute top-6 left-6 right-6 flex justify-between items-center z-40">
               <Badge className="bg-green-500 hover:bg-green-600 text-white border-0 px-4 py-2 text-sm font-medium shadow-lg">
@@ -299,8 +313,17 @@ const PropertySwipeCard: React.FC<PropertySwipeCardProps> = ({
                 <span className="text-gray-600 text-xs">({property.reviews})</span>
               </div>
             </div>
+            {/* View Details Button */}
+            <motion.button
+              className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white/90 text-blue-600 px-6 py-2 rounded-full shadow-lg font-semibold text-base pointer-events-auto"
+              whileTap={{ scale: 0.95 }}
+              whileHover={{ scale: 1.05 }}
+              onClick={() => navigate(`/property/${property.id}`)}
+              aria-label="View Details"
+            >
+              View Details
+            </motion.button>
           </div>
-
           {/* Property Details Section */}
           <div className="h-2/5 bg-white p-6 flex flex-col justify-between">
             {/* Main Property Info */}
@@ -319,7 +342,6 @@ const PropertySwipeCard: React.FC<PropertySwipeCardProps> = ({
                   {property.type}
                 </Badge>
               </div>
-
               {/* Price */}
               <div className="mb-4">
                 <div className="text-3xl font-bold text-gray-900">
@@ -327,7 +349,6 @@ const PropertySwipeCard: React.FC<PropertySwipeCardProps> = ({
                   <span className="text-lg font-normal text-gray-600">/month</span>
                 </div>
               </div>
-
               {/* Features */}
               <div className="mb-4">
                 <h4 className="text-gray-800 text-sm font-semibold mb-3 flex items-center">
@@ -354,9 +375,20 @@ const PropertySwipeCard: React.FC<PropertySwipeCardProps> = ({
                 )}
               </div>
             </div>
+            {/* Payment Button (Mobile Only) */}
+            <div className="flex flex-col space-y-3 mt-4 sm:hidden">
+              <React.Suspense fallback={<div>Loading...</div>}>
+                <PaymentButton
+                  propertyId={property.id}
+                  propertyTitle={property.title}
+                  rent={property.rent}
+                  // waterBill={...} // Pass water bill if available
+                />
+              </React.Suspense>
+            </div>
           </div>
         </div>
-      </Card>
+      </motion.div>
     </div>
   );
 };
