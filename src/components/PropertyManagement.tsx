@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,6 +13,7 @@ import { supabase } from '@/lib/supabaseClient';
 
 const PropertyManagement = () => {
   const { toast } = useToast();
+  const fileInputRef = useRef(null);
 
   // Form state for adding new property
   const [formData, setFormData] = useState({
@@ -29,7 +30,7 @@ const PropertyManagement = () => {
     landlordName: '',
     landlordPhone: '',
     paybill: '',
-    accountNumber: ''
+    houseNumber: ''
   });
 
   const [newFeature, setNewFeature] = useState('');
@@ -38,6 +39,7 @@ const PropertyManagement = () => {
   // Remove mock properties data
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [imagePreviews, setImagePreviews] = useState([]);
 
   useEffect(() => {
     async function fetchProperties() {
@@ -77,6 +79,13 @@ const PropertyManagement = () => {
     }));
   };
 
+  // Handle image selection
+  const handleImageChange = (e) => {
+    const files = Array.from(e.target.files) as File[];
+    setFormData(prev => ({ ...prev, images: files }));
+    setImagePreviews(files.map(file => URL.createObjectURL(file as File)));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.plotNumber || !formData.title || !formData.type || !formData.location || !formData.rent) {
@@ -86,6 +95,21 @@ const PropertyManagement = () => {
         variant: "destructive"
       });
       return;
+    }
+    // Upload images to Supabase Storage if any
+    let imageUrls = [];
+    if (formData.images && formData.images.length > 0) {
+      for (const file of formData.images) {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}.${fileExt}`;
+        const { data, error } = await supabase.storage.from('property-images').upload(fileName, file);
+        if (error) {
+          toast({ title: 'Image Upload Error', description: error.message, variant: 'destructive' });
+        } else {
+          const { publicUrl } = supabase.storage.from('property-images').getPublicUrl(fileName).data;
+          imageUrls.push(publicUrl);
+        }
+      }
     }
     const property = {
       plotNumber: formData.plotNumber,
@@ -99,20 +123,20 @@ const PropertyManagement = () => {
       tenant: '',
       image: 'https://images.unsplash.com/photo-1512917774080-9991f1c9c7ca',
       lastPayment: '',
-      dateAdded: new Date().toISOString().split('T')[0],
       features: formData.features,
       description: formData.description,
-      images: formData.images,
+      images: imageUrls,
       landlordName: formData.landlordName,
       landlordPhone: formData.landlordPhone,
       paybill: formData.paybill,
-      accountNumber: formData.accountNumber
+      houseNumber: formData.houseNumber
     };
     const { error } = await supabase.from('properties').insert([property]);
     if (!error) {
       setFormData({
-        plotNumber: '', title: '', type: '', location: '', neighborhood: '', rent: '', waterBillCost: '', description: '', features: [], images: [], landlordName: '', landlordPhone: '', paybill: '', accountNumber: ''
+        plotNumber: '', title: '', type: '', location: '', neighborhood: '', rent: '', waterBillCost: '', description: '', features: [], images: [], landlordName: '', landlordPhone: '', paybill: '', houseNumber: ''
       });
+      setImagePreviews([]);
       toast({
         title: "Property Added Successfully",
         description: `${property.title} has been added to the listings`,
@@ -332,9 +356,33 @@ const PropertyManagement = () => {
                       <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
                       <h3 className="text-lg font-medium text-gray-900 mb-2">Upload Property Images</h3>
                       <p className="text-gray-600 mb-4">Drag and drop images or click to browse</p>
-                      <Button type="button" variant="outline">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        ref={fileInputRef}
+                        style={{ display: 'none' }}
+                        onChange={handleImageChange}
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => fileInputRef.current && fileInputRef.current.click()}
+                      >
                         Select Images
                       </Button>
+                      {imagePreviews.length > 0 && (
+                        <div className="flex flex-wrap gap-2 mt-4 justify-center">
+                          {imagePreviews.map((src, idx) => (
+                            <img
+                              key={idx}
+                              src={src}
+                              alt={`preview-${idx}`}
+                              className="w-24 h-24 object-cover rounded border"
+                            />
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
@@ -376,12 +424,12 @@ const PropertyManagement = () => {
                         />
                       </div>
                       <div>
-                        <Label htmlFor="accountNumber">Account Number</Label>
+                        <Label htmlFor="houseNumber">House Number</Label>
                         <Input
-                          id="accountNumber"
+                          id="houseNumber"
                           placeholder="HOUSE001"
-                          value={formData.accountNumber}
-                          onChange={(e) => handleInputChange('accountNumber', e.target.value)}
+                          value={formData.houseNumber}
+                          onChange={(e) => handleInputChange('houseNumber', e.target.value)}
                           required
                         />
                       </div>
@@ -426,7 +474,7 @@ const PropertyManagement = () => {
                           <p><strong>Water Bill:</strong> KSh {property.waterBillCost ? property.waterBillCost.toLocaleString() : 0}/month</p>
                           {property.tenant && <p><strong>Tenant:</strong> {property.tenant}</p>}
                           <div className="flex flex-wrap gap-1 mt-2">
-                            {property.features.map(feature => (
+                            {(property.features || []).map(feature => (
                               <Badge key={feature} variant="outline" className="text-xs">
                                 {feature}
                               </Badge>
@@ -453,20 +501,6 @@ const PropertyManagement = () => {
           </Card>
         </TabsContent>
       </Tabs>
-
-      {/* Floating Add Property Button */}
-      <button
-        onClick={() => {
-          const form = document.querySelector('form');
-          if (form) form.scrollIntoView({ behavior: 'smooth' });
-        }}
-        className="fixed bottom-8 right-8 z-50 bg-green-600 hover:bg-green-700 text-white rounded-full shadow-xl p-4 flex items-center justify-center border-4 border-white focus:outline-none focus:ring-4 focus:ring-green-300"
-        title="Add New Property"
-        style={{ boxShadow: '0 4px 24px rgba(34,197,94,0.3)' }}
-      >
-        <Home className="w-7 h-7" />
-        <span className="ml-2 font-bold text-lg hidden sm:inline">Add Property</span>
-      </button>
     </div>
   );
 };

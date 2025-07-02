@@ -205,58 +205,9 @@ const AdminDashboard = () => {
       </header>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Tabs defaultValue="overview" className="w-full">
-          <TabsList className="mb-6 flex flex-wrap gap-2">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="properties">Properties</TabsTrigger>
-            <TabsTrigger value="tenants">Tenants</TabsTrigger>
-            <TabsTrigger value="analytics">Analytics</TabsTrigger>
-            <TabsTrigger value="reports">Reports</TabsTrigger>
-          </TabsList>
-          <TabsContent value="overview">
-            <Card className="mb-8">
-              <CardHeader>
-                <CardTitle>Overview</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-gray-600">Summary stats and quick links will go here.</div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          <TabsContent value="properties">
-            <PropertyManagement />
-          </TabsContent>
-          <TabsContent value="tenants">
-            <Card className="mb-8">
-              <CardHeader>
-                <CardTitle>Tenants</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-gray-600">List of tenants will go here.</div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          <TabsContent value="analytics">
-            <Card className="mb-8">
-              <CardHeader>
-                <CardTitle>Analytics</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-gray-600">Analytics charts and data will go here.</div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          <TabsContent value="reports">
-            <Card className="mb-8">
-              <CardHeader>
-                <CardTitle>Reports</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-gray-600">Financial and payment reports will go here.</div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+        <h2 className="text-3xl font-bold text-gray-900 mb-6">Add New Property or Plot</h2>
+        <PropertyManagement />
+        {/* You can add other dashboard content below if needed */}
       </div>
     </div>
   );
